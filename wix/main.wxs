@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<!--
+Copyright (C) 2017 Christopher R. Field.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+The "cargo wix" subcommand provides a variety of predefined variables available
+for customization of this template. The values for each variable are set at
+installer creation time. The following variables are available:
+
+TargetTriple      = The rustc target triple name.
+TargetEnv         = The rustc target environment. This is typically either
+"msvc" or "gnu" depending on the toolchain downloaded and
+installed.
+TargetVendor      = The rustc target vendor. This is typically "pc", but Rust
+does support other vendors, like "uwp".
+CargoTargetBinDir = The complete path to the binary (exe). The default would
+be "target\release\<BINARY_NAME>.exe" where
+  "<BINARY_NAME>" is replaced with the name of each binary
+  target defined in the package's manifest (Cargo.toml). If
+  a different rustc target triple is used than the host,
+  i.e. cross-compiling, then the default path would be
+  "target\<CARGO_TARGET>\<CARGO_PROFILE>\<BINARY_NAME>.exe",
+  where "<CARGO_TARGET>" is replaced with the "CargoTarget"
+  variable value and "<CARGO_PROFILE>" is replaced with the
+  value from the `CargoProfile` variable.
+  CargoTargetDir    = The path to the directory for the build artifacts, i.e.
+  "target".
+  CargoProfile      = Either "debug" or `release` depending on the build
+  profile. The default is "release".
+  Version           = The version for the installer. The default is the
+  "Major.Minor.Fix" semantic versioning number of the Rust
+  package.
+-->
+
+    <!--
+      Please do not remove these pre-processor If-Else blocks. These are used with
+      the `cargo wix` subcommand to automatically determine the installation
+      destination for 32-bit versus 64-bit installers. Removal of these lines will
+      cause installation errors.
+    -->
+  <?if $(sys.BUILDARCH) = x64 or $(sys.BUILDARCH) = arm64 ?>
+  <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+  <?else ?>
+  <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+  <?endif ?>
+  <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+    <Product
+      Id='*'
+      Name='EVA ICS Cloud Manager UI'
+      UpgradeCode='D7EF25FD-CF37-41EE-BE0C-BF2FC7EC7673'
+      Manufacturer='Bohemia Automation'
+      Language='1033'
+      Codepage='1252'
+      Version='$(var.Version)'>
+    <Package Id='*'
+      Keywords='Installer'
+      Description='EVA ICS Cloud Manager UI application'
+      Manufacturer='Bohemia Automation'
+      InstallerVersion='450'
+      Languages='1033'
+      Compressed='yes'
+      InstallScope='perMachine'
+      SummaryCodepage='1252'
+      />
+    <MajorUpgrade
+      Schedule='afterInstallInitialize'
+      DowngradeErrorMessage='A newer version of [ProductName] is already installed. Setup will now exit.'/>
+    <Media Id='1' Cabinet='media1.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1'/>
+    <Property Id='DiskPrompt' Value='EVA ICS Cloud Manager UI Installation'/>
+    <Directory Id='TARGETDIR' Name='SourceDir'>
+      <Directory Id='$(var.PlatformProgramFilesFolder)' Name='PFiles'>
+        <Directory Id='APPLICATIONFOLDER' Name='ecmui'>
+          <Directory Id='Bin' Name='bin'>
+            <Component Id='binary0' Guid='*'>
+              <File
+                Id='ecmui.exe'
+                Name='ecmui.exe'
+                DiskId='1'
+                Source='$(var.CargoTargetBinDir)\ecmui.exe'
+                KeyPath='yes' />
+            </Component>
+            <Component Id='qt5core'>
+              <File Source='c:\Qt5.12\5.12.8\msvc2017_64\bin\Qt5Core.dll' />
+            </Component>
+            <Component Id='qt5widgets'>
+              <File Source='c:\Qt5.12\5.12.8\msvc2017_64\bin\Qt5Widgets.dll' />
+            </Component>
+            <Component Id='qt5gui'>
+              <File Source='c:\Qt5.12\5.12.8\msvc2017_64\bin\Qt5Gui.dll' />
+            </Component>
+            <Component Id='qt5charts'>
+              <File Source='c:\Qt5.12\5.12.8\msvc2017_64\bin\Qt5Charts.dll' />
+            </Component>
+          </Directory>
+        </Directory>
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="EVA ICS"/>
+      </Directory>
+    </Directory>
+    <DirectoryRef Id="ApplicationProgramsFolder">
+      <Component Id="ApplicationShortcut" Guid="*">
+        <Shortcut Id="ApplicationStartMenuShortcut"
+          Name="EVA ICS CM UI"
+          Description="EVA ICS Cloud Manager UI"
+          Target="[#ecmui.exe]"
+          WorkingDirectory="Bin"/>
+        <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\BohemiaAutomation\ECMUI" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+    <Feature
+      Id='Binaries'
+      Title='CloudManager UI'
+      Description='Installs EVA ICS Cloud Manager UI binary and required 3rd party libraries'
+      Level='1'
+      ConfigurableDirectory='APPLICATIONFOLDER'
+      AllowAdvertise='no'
+      Display='expand'
+      Absent='disallow'>
+    <ComponentRef Id='binary0'/>
+    <ComponentRef Id='qt5core'/>
+    <ComponentRef Id='qt5widgets'/>
+    <ComponentRef Id='qt5gui'/>
+    <ComponentRef Id='qt5charts'/>
+    <ComponentRef Id='ApplicationShortcut'/>
+  </Feature>
+  <SetProperty Id='ARPINSTALLLOCATION' Value='[APPLICATIONFOLDER]' After='CostFinalize'/>
+  <Icon Id='ProductICO' SourceFile='wix\ecmui.ico'/>
+  <Property Id='ARPPRODUCTICON' Value='ProductICO' />
+  <Property Id='ARPHELPLINK' Value='https://github.com/eva-ics/ecmui'/>
+  <UI>
+    <UIRef Id='WixUI_FeatureTree'/>
+  </UI>
+  <WixVariable Id='WixUILicenseRtf' Value='wix\eula.rtf'/>
+  <WixVariable Id='WixUIBannerBmp' Value='wix\top.bmp'/>
+  <WixVariable Id='WixUIDialogBmp' Value='wix\ba.bmp'/>
+</Product>
+</Wix>

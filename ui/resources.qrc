@@ -1,0 +1,29 @@
+<RCC>
+  <qresource prefix="/">
+    <file>i/bma.png</file>
+    <file>i/ecmui.ico</file>
+    <file>i/icons/copy.png</file>
+    <file>i/icons/reload.png</file>
+    <file>i/icons/connect.png</file>
+    <file>i/icons/disconnect.png</file>
+    <file>i/icons/gears.png</file>
+    <file>i/icons/completed.png</file>
+    <file>i/icons/error.png</file>
+    <file>i/icons/add.png</file>
+    <file>i/icons/edit.png</file>
+    <file>i/icons/delete.png</file>
+    <file>i/icons/import.png</file>
+    <file>i/icons/export.png</file>
+    <file>i/icons/services.png</file>
+    <file>i/icons/items.png</file>
+    <file>i/icons/chart.png</file>
+    <file>i/icons/stop.png</file>
+    <file>i/icons/start.png</file>
+    <file>i/icons/node.png</file>
+    <file>i/icons/broker.png</file>
+    <file>i/icons/spoints.png</file>
+    <file>i/icons/log.png</file>
+    <file>i/icons/action.png</file>
+    <file>i/logo.png</file>
+  </qresource>
+</RCC>

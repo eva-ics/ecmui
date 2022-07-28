@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>440</width>
+    <height>565</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>440</width>
+    <height>565</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>440</width>
+    <height>565</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Watch</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/i/icons/action.png</normaloff>:/i/icons/action.png</iconset>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>false</bool>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
+     <item>
+      <layout class="QGridLayout" name="workspace">
+       <item row="1" column="0">
+        <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="uUIDLabel">
+           <property name="font">
+            <font>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>&amp;UUID</string>
+           </property>
+           <property name="buddy">
+            <cstring>i_uuid</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="i_uuid">
+           <property name="font">
+            <font>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>5aef4bbc-3a5a-4caf-93b1-ebe5898fe173</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="3" column="0">
+        <widget class="QTabWidget" name="tabWidget">
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="tab">
+          <attribute name="title">
+           <string>&amp;Action</string>
+          </attribute>
+          <widget class="QWidget" name="formLayoutWidget">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>401</width>
+             <height>161</height>
+            </rect>
+           </property>
+           <layout class="QFormLayout" name="formLayout_2">
+            <item row="1" column="0">
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>&amp;Node</string>
+              </property>
+              <property name="buddy">
+               <cstring>i_node</cstring>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="i_node">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>O&amp;ID</string>
+              </property>
+              <property name="buddy">
+               <cstring>i_oid</cstring>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLineEdit" name="i_oid">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Status</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QLabel" name="label_status">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>?</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::RichText</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QLineEdit" name="i_exitcode">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>E&amp;xit code</string>
+              </property>
+              <property name="buddy">
+               <cstring>i_exitcode</cstring>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>Se&amp;rvice</string>
+              </property>
+              <property name="buddy">
+               <cstring>i_svc</cstring>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLineEdit" name="i_svc">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QGroupBox" name="groupBox">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>170</y>
+             <width>411</width>
+             <height>271</height>
+            </rect>
+           </property>
+           <property name="title">
+            <string>&amp;Time</string>
+           </property>
+           <widget class="QWidget" name="formLayoutWidget_3">
+            <property name="geometry">
+             <rect>
+              <x>3</x>
+              <y>21</y>
+              <width>401</width>
+              <height>241</height>
+             </rect>
+            </property>
+            <layout class="QFormLayout" name="form_times">
+             <item row="1" column="0">
+              <widget class="QLabel" name="createdLabel">
+               <property name="text">
+                <string>Created</string>
+               </property>
+               <property name="buddy">
+                <cstring>i_time_created</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="i_time_created">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="acceptedLabel">
+               <property name="text">
+                <string>Accepted</string>
+               </property>
+               <property name="buddy">
+                <cstring>i_time_accepted</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLineEdit" name="i_time_accepted">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="0">
+              <widget class="QLabel" name="elapsedLabel">
+               <property name="text">
+                <string>Elapsed</string>
+               </property>
+               <property name="buddy">
+                <cstring>i_time_elapsed</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="1">
+              <widget class="QLineEdit" name="i_time_elapsed">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_4">
+               <property name="text">
+                <string>Pending</string>
+               </property>
+               <property name="buddy">
+                <cstring>i_time_pending</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QLineEdit" name="i_time_pending">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="label_7">
+               <property name="text">
+                <string>Running</string>
+               </property>
+               <property name="buddy">
+                <cstring>i_time_running</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QLineEdit" name="i_time_running">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0">
+              <widget class="QLabel" name="label_time_result">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QLineEdit" name="i_time_result">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+         </widget>
+         <widget class="QWidget" name="tab_4">
+          <attribute name="title">
+           <string>&amp;Params</string>
+          </attribute>
+          <widget class="QPlainTextEdit" name="i_params">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>412</width>
+             <height>448</height>
+            </rect>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </widget>
+         <widget class="QWidget" name="tab_2">
+          <attribute name="title">
+           <string>&amp;Output</string>
+          </attribute>
+          <widget class="QPlainTextEdit" name="i_out">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>412</width>
+             <height>448</height>
+            </rect>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="plainText">
+            <string>[
+    {
+        &quot;err&quot;: null,
+        &quot;exitcode&quot;: 0,
+        &quot;finished&quot;: true,
+        &quot;node&quot;: &quot;lab-ws3&quot;,
+        &quot;oid&quot;: &quot;unit:tests/u1&quot;,
+        &quot;out&quot;: null,
+        &quot;params&quot;: {
+            &quot;status&quot;: 0
+        },
+        &quot;priority&quot;: 100,
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;svc&quot;: &quot;eva.controller.v1&quot;,
+        &quot;time&quot;: {
+            &quot;accepted&quot;: 1658912154.3939023,
+            &quot;completed&quot;: 1658912154.3944387,
+            &quot;created&quot;: 1658912154.3922591
+        },
+        &quot;uuid&quot;: &quot;5aef4bbc-3a5a-4caf-93b1-ebe5898fe173&quot;
+    }
+]
+</string>
+           </property>
+          </widget>
+         </widget>
+         <widget class="QWidget" name="tab_3">
+          <attribute name="title">
+           <string>&amp;Error</string>
+          </attribute>
+          <widget class="QPlainTextEdit" name="i_err">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>412</width>
+             <height>448</height>
+            </rect>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="plainText">
+            <string>[
+    {
+        &quot;err&quot;: null,
+        &quot;exitcode&quot;: 0,
+        &quot;finished&quot;: true,
+        &quot;node&quot;: &quot;lab-ws3&quot;,
+        &quot;oid&quot;: &quot;unit:tests/u1&quot;,
+        &quot;out&quot;: null,
+        &quot;params&quot;: {
+            &quot;status&quot;: 0
+        },
+        &quot;priority&quot;: 100,
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;svc&quot;: &quot;eva.controller.v1&quot;,
+        &quot;time&quot;: {
+            &quot;accepted&quot;: 1658912154.3939023,
+            &quot;completed&quot;: 1658912154.3944387,
+            &quot;created&quot;: 1658912154.3922591
+        },
+        &quot;uuid&quot;: &quot;5aef4bbc-3a5a-4caf-93b1-ebe5898fe173&quot;
+    }
+]
+</string>
+           </property>
+          </widget>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btn_close">
+         <property name="text">
+          <string>&amp;Close</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>i_uuid</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>i_oid</tabstop>
+  <tabstop>i_node</tabstop>
+  <tabstop>i_svc</tabstop>
+  <tabstop>i_exitcode</tabstop>
+  <tabstop>i_time_created</tabstop>
+  <tabstop>i_time_accepted</tabstop>
+  <tabstop>i_time_pending</tabstop>
+  <tabstop>i_time_running</tabstop>
+  <tabstop>i_time_result</tabstop>
+  <tabstop>i_time_elapsed</tabstop>
+  <tabstop>i_params</tabstop>
+  <tabstop>i_out</tabstop>
+  <tabstop>i_err</tabstop>
+  <tabstop>btn_close</tabstop>
+ </tabstops>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>
