@@ -84,26 +84,29 @@ be "target\release\<BINARY_NAME>.exe" where
       <Merge Id="VCRedist" SourceFile="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Redist\MSVC\14.16.27012\MergeModules\Microsoft_VC141_CRT_x64.msm" DiskId="1" Language="0"/>
       <Directory Id='$(var.PlatformProgramFilesFolder)' Name='PFiles'>
         <Directory Id='APPLICATIONFOLDER' Name='ecmui'>
-          <Directory Id='Bin' Name='bin'>
-            <Component Id='binary0' Guid='*'>
-              <File
-                Id='ecmui.exe'
-                Name='ecmui.exe'
-                DiskId='1'
-                Source='$(var.CargoTargetBinDir)\ecmui.exe'
-                KeyPath='yes' />
-            </Component>
-            <Component Id='qt5core'>
-              <File Source='c:\Qt5.12\5.12.8\msvc2017_64\bin\Qt5Core.dll' />
-            </Component>
-            <Component Id='qt5widgets'>
-              <File Source='c:\Qt5.12\5.12.8\msvc2017_64\bin\Qt5Widgets.dll' />
-            </Component>
-            <Component Id='qt5gui'>
-              <File Source='c:\Qt5.12\5.12.8\msvc2017_64\bin\Qt5Gui.dll' />
-            </Component>
-            <Component Id='qt5charts'>
-              <File Source='c:\Qt5.12\5.12.8\msvc2017_64\bin\Qt5Charts.dll' />
+          <Component Id='binary0' Guid='*'>
+            <File
+              Id='ecmui.exe'
+              Name='ecmui.exe'
+              DiskId='1'
+              Source='$(var.CargoTargetBinDir)\ecmui.exe'
+              KeyPath='yes' />
+          </Component>
+          <Component Id='qt5core'>
+            <File Source='c:\Qt5.12\5.12.8\msvc2017_64\bin\Qt5Core.dll' />
+          </Component>
+          <Component Id='qt5widgets'>
+            <File Source='c:\Qt5.12\5.12.8\msvc2017_64\bin\Qt5Widgets.dll' />
+          </Component>
+          <Component Id='qt5gui'>
+            <File Source='c:\Qt5.12\5.12.8\msvc2017_64\bin\Qt5Gui.dll' />
+          </Component>
+          <Component Id='qt5charts'>
+            <File Source='c:\Qt5.12\5.12.8\msvc2017_64\bin\Qt5Charts.dll' />
+          </Component>
+          <Directory Id="qtplatform" Name="platforms">
+            <Component Id="qwindows">
+              <File Id="qwindowsdll" Source="c:\Qt5.12\5.12.8\msvc2017_64\plugins\platforms\qwindows.dll"/>
             </Component>
           </Directory>
         </Directory>
@@ -118,7 +121,7 @@ be "target\release\<BINARY_NAME>.exe" where
           Name="EVA ICS CM UI"
           Description="EVA ICS Cloud Manager UI"
           Target="[#ecmui.exe]"
-          WorkingDirectory="Bin"/>
+          WorkingDirectory="APPLICATIONFOLDER"/>
         <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
         <RegistryValue Root="HKCU" Key="Software\BohemiaAutomation\ECMUI" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
       </Component>
@@ -137,6 +140,7 @@ be "target\release\<BINARY_NAME>.exe" where
     <ComponentRef Id='qt5widgets'/>
     <ComponentRef Id='qt5gui'/>
     <ComponentRef Id='qt5charts'/>
+    <ComponentRef Id='qwindows'/>
     <ComponentRef Id='ApplicationShortcut'/>
   </Feature>
   <Feature Id="VCRedist" Title="Visual C++ 2017 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
