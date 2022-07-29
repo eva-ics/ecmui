@@ -81,6 +81,7 @@ be "target\release\<BINARY_NAME>.exe" where
     <Media Id='1' Cabinet='media1.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1'/>
     <Property Id='DiskPrompt' Value='EVA ICS Cloud Manager UI Installation'/>
     <Directory Id='TARGETDIR' Name='SourceDir'>
+      <Merge Id="VCRedist" SourceFile="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Redist\MSVC\14.16.27012\MergeModules\Microsoft_VC141_CRT_x64.msm" DiskId="1" Language="0"/>
       <Directory Id='$(var.PlatformProgramFilesFolder)' Name='PFiles'>
         <Directory Id='APPLICATIONFOLDER' Name='ecmui'>
           <Directory Id='Bin' Name='bin'>
@@ -103,9 +104,6 @@ be "target\release\<BINARY_NAME>.exe" where
             </Component>
             <Component Id='qt5charts'>
               <File Source='c:\Qt5.12\5.12.8\msvc2017_64\bin\Qt5Charts.dll' />
-            </Component>
-            <Component Id='vcruntime'>
-              <File Source='c:\Windows\SysWow64\vcruntime140.dll' />
             </Component>
           </Directory>
         </Directory>
@@ -139,8 +137,10 @@ be "target\release\<BINARY_NAME>.exe" where
     <ComponentRef Id='qt5widgets'/>
     <ComponentRef Id='qt5gui'/>
     <ComponentRef Id='qt5charts'/>
-    <ComponentRef Id='vcruntime'/>
     <ComponentRef Id='ApplicationShortcut'/>
+  </Feature>
+  <Feature Id="VCRedist" Title="Visual C++ 2017 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+    <MergeRef Id="VCRedist"/>
   </Feature>
   <SetProperty Id='ARPINSTALLLOCATION' Value='[APPLICATIONFOLDER]' After='CostFinalize'/>
   <Icon Id='ProductICO' SourceFile='wix\ecmui.ico'/>
