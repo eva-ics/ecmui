@@ -6,15 +6,20 @@ all:
 prepare:
 	sudo apt -y install libqt5webkit5-dev qttools5-dev qtbase5-dev-tools libqt5charts5-dev libssl-dev pkg-config g++ cmake
 
-pkg: clean-pkg build-deb build-msi
+pkg: clean-pkg build-deb-u20 build-deb-u22 build-msi
 
 clean-pkg:
 	rm -rf target/pkg
 
-build-deb:
+build-deb-u20:
 	mkdir -p target/pkg
 	ssh -t lab-builder1 ". ~/.cargo/env && cd /build/ecmui && git checkout Cargo.lock && git pull && make prepare && cargo build --release && cargo bundle --release"
-	scp lab-builder1:/build/ecmui/target/release/bundle/deb/ecmui_${VERSION}_amd64.deb ./target/pkg/
+	scp lab-builder1:/build/ecmui/target/release/bundle/deb/ecmui_${VERSION}_amd64.deb ./target/pkg/ecmui_${VERSION}_ubuntu20.04_amd64.deb
+
+build-deb-u22:
+	mkdir -p target/pkg
+	ssh -t lab-builder-u22 ". ~/.cargo/env && cd /build/ecmui && git checkout Cargo.lock && git pull && make prepare && cargo build --release && cargo bundle --release"
+	scp lab-builder-u22:/build/ecmui/target/release/bundle/deb/ecmui_${VERSION}_amd64.deb ./target/pkg/ecmui_${VERSION}_ubuntu22.04_amd64.deb
 
 build-msi:
 	mkdir -p target/pkg
