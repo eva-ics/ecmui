@@ -6,6 +6,12 @@ all:
 prepare:
 	sudo apt -y install libqt5webkit5-dev qttools5-dev qtbase5-dev-tools libqt5charts5-dev libssl-dev pkg-config g++ cmake
 
+release: pkg upload-pkg
+
+upload-pkg:
+	gsutil -m cp -a public-read target/pkg/* gs://pub.bma.ai/ecmui/${VERSION}/
+	jks build pub.bma.ai
+
 pkg: clean-pkg build-deb-u20 build-deb-u22 build-msi
 
 clean-pkg:
