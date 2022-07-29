@@ -18,5 +18,5 @@ build-deb:
 
 build-msi:
 	mkdir -p target/pkg
-	ssh -t lab-win1 "cd /src && init.bat && cd /src/ecmui && git checkout Cargo.lock && git pull && cargo build --release && cargo wix"
-	scp lab-win1:/src/ecmui/target/wix/ecmui-${VERSION}-x86_64.msi ./target/pkg/
+	ssh -t lab-vwin1 "cd /src && init.bat && cd /src/ecmui && git checkout Cargo.lock && git pull && cargo build --release && cargo wix"
+	scp lab-vwin1:/src/ecmui/target/wix/ecmui-${VERSION}-x86_64.msi ./target/pkg/
