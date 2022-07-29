@@ -65,9 +65,10 @@ fn main() {
         q_init_resource!("resources");
         let ui = ui::Ui::new();
         unsafe {
+            ui.show();
             let icon = main_icon();
             QApplication::set_window_icon(&icon);
-            ui.show();
+            ui.window.widget.set_window_icon(&icon);
             let res = QApplication::exec();
             ui.terminate();
             res
