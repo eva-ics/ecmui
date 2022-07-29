@@ -55,8 +55,10 @@ pub fn set_status(status: impl std::fmt::Display, kind: StatusKind) {
 }
 
 pub fn command(c: Command) {
-    if crate::UI_TX.get().unwrap().lock().unwrap().send(c).is_err() {
-        std::process::exit(5);
+    unsafe {
+        if crate::UI_TX.get().unwrap().lock().unwrap().send(c).is_err() {
+            std::process::exit(5);
+        }
     }
 }
 
@@ -219,7 +221,6 @@ pub struct Ui {
     busy: Rc<forms::Busy>,
     _source_model: QBox<QStandardItemModel>,
     _proxy_model: QBox<QSortFilterProxyModel>,
-    cmd_timer: QBox<QTimer>,
     cleanup_timer: QBox<QTimer>,
     cmd_rx: mpsc_std::Receiver<Command>,
     tree_items: Mutex<HashMap<String, NodeTreeItem>>,
@@ -263,7 +264,6 @@ impl Ui {
     pub fn new() -> Rc<Self> {
         unsafe {
             let (cmd_tx, cmd_rx) = mpsc_std::sync_channel::<Command>(32768);
-            let cmd_timer: QBox<QTimer> = QTimer::new_0a();
             let cleanup_timer: QBox<QTimer> = QTimer::new_0a();
             let window = forms::Main::load();
             let title = window.widget.window_title().to_std_string();
@@ -284,7 +284,6 @@ impl Ui {
                 busy: Rc::new(forms::Busy::load()),
                 _source_model: QStandardItemModel::new_0a(),
                 _proxy_model: QSortFilterProxyModel::new_0a(),
-                cmd_timer,
                 cleanup_timer,
                 cmd_rx,
                 tree_items: <_>::default(),
@@ -311,11 +310,6 @@ impl Ui {
             });
             this.init(cmd_tx);
             this.dialog_export.init(&this.slot_on_export_clicked());
-            this.cmd_timer
-                .timeout()
-                .connect(&this.slot_handle_cmd_timer());
-            this.cmd_timer
-                .start_1a(crate::UI_CMD_INTERVAL.as_millis().try_into().unwrap());
             this.cleanup_timer.timeout().connect(&this.slot_cleanup());
             this.cleanup_timer
                 .start_1a(crate::UI_CLEANUP_INTERVAL.as_millis().try_into().unwrap());
@@ -346,7 +340,7 @@ impl Ui {
         self.action_timer.start_0a();
     }
     #[slot(SlotNoArgs)]
-    unsafe fn handle_cmd_timer(self: &Rc<Self>) {
+    unsafe fn handle_cmd(self: &Rc<Self>) {
         // move to events(?)
         if self.window.widget.is_visible() {
             if let Some(config) = self.config.lock().unwrap().as_mut() {
@@ -468,7 +462,12 @@ impl Ui {
     }
     #[allow(clippy::too_many_lines)]
     unsafe fn init(self: &Rc<Self>, cmd_tx: mpsc_std::SyncSender<Command>) {
-        crate::UI_TX.set(Mutex::new(cmd_tx)).unwrap();
+        let cmd_ch = crate::com_channel::ComChannel::new(cmd_tx);
+        cmd_ch.signal().connect(&self.slot_handle_cmd());
+        crate::UI_TX
+            .set(Mutex::new(cmd_ch))
+            .map_err(|_| Error::failed("FAILED TO SET UI TX"))
+            .unwrap();
         self.clear_workspace();
         self.dialog_about.init();
         self.busy.init();

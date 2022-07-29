@@ -7,12 +7,12 @@ use qt_core::q_init_resource;
 use qt_widgets::QApplication;
 use std::env;
 use std::path::PathBuf;
-use std::sync::mpsc as mpsc_std;
 use std::sync::Mutex;
 use std::time::Duration;
 use tokio::task::JoinHandle;
 
 mod bus;
+mod com_channel;
 mod common;
 mod forms;
 mod output;
@@ -21,8 +21,7 @@ mod ui;
 
 use common::Nit;
 
-const UI_CMD_INTERVAL: Duration = Duration::from_millis(100);
-const UI_CLEANUP_INTERVAL: Duration = Duration::from_millis(100);
+const UI_CLEANUP_INTERVAL: Duration = Duration::from_millis(500);
 const BUS_CLIENT_NAME: &str = "ecmui";
 const CONTROLLER_SVC_PFX: &str = "eva.controller.";
 
@@ -32,7 +31,7 @@ lazy_static! {
     static ref CONNECTION: Mutex<Option<JoinHandle<()>>> = <_>::default();
     static ref NIT_HANDLER: Mutex<Option<JoinHandle<()>>> = <_>::default();
     static ref LAST_NIT: Mutex<Option<Nit>> = <_>::default();
-    static ref UI_TX: OnceCell<Mutex<mpsc_std::SyncSender<ui::Command>>> = <_>::default();
+    static ref UI_TX: OnceCell<Mutex<com_channel::ComChannel<ui::Command>>> = <_>::default();
     static ref CONFIG_FILE: Option<PathBuf> =
         if let Some(dirs) = ProjectDirs::from("com", "bohemia-automation", "ecmui") {
             let mut p = dirs.config_dir().to_owned();
