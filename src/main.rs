@@ -53,7 +53,7 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 unsafe fn main_icon() -> CppBox<QIcon> {
     let pixmap = QPixmap::new();
-    pixmap.load_1a(&qs(format!(":/i/icons/logo.png")));
+    pixmap.load_1a(&qs(format!(":/i/logo.png")));
     let icon = QIcon::new();
     icon.add_pixmap_1a(&pixmap);
     icon
