@@ -1,9 +1,11 @@
 #![windows_subsystem = "windows"]
 
+use cpp_core::CppBox;
 use directories::ProjectDirs;
 use lazy_static::lazy_static;
 use once_cell::sync::OnceCell;
-use qt_core::q_init_resource;
+use qt_core::{q_init_resource, qs};
+use qt_gui::{QIcon, QPixmap};
 use qt_widgets::QApplication;
 use std::env;
 use std::path::PathBuf;
@@ -49,12 +51,22 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 //pub(crate) fn qwebview_eval(view: *mut QWidget, code: *const c_char);
 //}
 
+unsafe fn main_icon() -> CppBox<QIcon> {
+    let pixmap = QPixmap::new();
+    pixmap.load_1a(&qs(format!(":/i/icons/logo.png")));
+    let icon = QIcon::new();
+    icon.add_pixmap_1a(&pixmap);
+    icon
+}
+
 fn main() {
     std::env::set_var("QT_AUTO_SCREEN_SCALE_FACTOR", "1");
     QApplication::init(|_| {
         q_init_resource!("resources");
         let ui = ui::Ui::new();
         unsafe {
+            let icon = main_icon();
+            QApplication::set_window_icon(&icon);
             ui.show();
             let res = QApplication::exec();
             ui.terminate();
