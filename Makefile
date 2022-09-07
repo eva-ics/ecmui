@@ -12,7 +12,10 @@ upload-pkg:
 	gsutil -m cp -a public-read target/pkg/* gs://pub.bma.ai/ecmui/${VERSION}/
 	jks build pub.bma.ai
 
-pkg: clean-pkg build-deb-u20 build-deb-u22 build-msi
+pkg: check clean-pkg build-deb-u20 build-deb-u22 build-msi
+
+check:
+	curl -sI https://pub.bma.ai/ecmui/${VERSION}/ecmui-${VERSION}-x86_64.msi > /dev/null 2>&1|head -1|grep " 404 " || echo "Version already exists" && exit 1
 
 clean-pkg:
 	rm -rf target/pkg
