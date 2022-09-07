@@ -196,6 +196,8 @@ pub struct ServiceParams {
     #[serde(default)]
     pub command: String,
     pub prepare_command: Option<String>,
+    #[serde(default = "eva_common::tools::default_true")]
+    pub enabled: bool,
     #[serde(default)]
     pub react_to_fail: bool,
     #[serde(default)]

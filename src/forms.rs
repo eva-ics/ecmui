@@ -604,6 +604,7 @@ pub struct DialogSvcEdit {
     i_prepare_command: QPtr<QLineEdit>,
     i_config: QPtr<QPlainTextEdit>,
     i_launcher: QPtr<QComboBox>,
+    i_enabled: QPtr<QCheckBox>,
     i_react_to_fail: QPtr<QCheckBox>,
     i_user: QPtr<QLineEdit>,
     i_workers: QPtr<QSpinBox>,
@@ -676,6 +677,7 @@ impl DialogSvcEdit {
         self.i_command.set_text(&qs(""));
         self.i_prepare_command.set_text(&qs(""));
         self.i_config.set_plain_text(&qs(""));
+        self.i_enabled.set_check_state(CheckState::Checked);
         self.i_react_to_fail.set_check_state(CheckState::Unchecked);
         self.i_user.set_text(&qs(""));
         self.i_workers.set_value(1);
@@ -724,6 +726,11 @@ impl DialogSvcEdit {
                 return;
             }
         }
+        self.i_enabled.set_check_state(if params.enabled {
+            CheckState::Checked
+        } else {
+            CheckState::Unchecked
+        });
         self.i_react_to_fail
             .set_check_state(if params.react_to_fail {
                 CheckState::Checked
@@ -816,6 +823,7 @@ impl DialogSvcEdit {
             id: self.i_id.gso(),
             command: self.i_command.gs(),
             prepare_command: self.i_prepare_command.gso(),
+            enabled: self.i_enabled.check_state() == CheckState::Checked,
             react_to_fail: self.i_react_to_fail.check_state() == CheckState::Checked,
             user: self.i_user.gso(),
             config,
