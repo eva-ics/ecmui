@@ -15,7 +15,8 @@ upload-pkg:
 pkg: check clean-pkg build-deb-u20 build-deb-u22 build-msi
 
 check:
-	curl -sI https://pub.bma.ai/ecmui/${VERSION}/ecmui-${VERSION}-x86_64.msi > /dev/null 2>&1|head -1|grep " 404 " || echo "Version already exists" && exit 1
+	if ! curl -sI https://pub.bma.ai/ecmui/${VERSION}/ecmui-${VERSION}-x86_64.msi 2>&1 \
+		|head -1|grep " 404 " > /dev/null; then  echo "Version already exists"; exit 1; fi
 
 clean-pkg:
 	rm -rf target/pkg
