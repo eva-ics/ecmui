@@ -4,6 +4,8 @@ This repository contains source code of EVA ICS Cloud Manager UI
 
 The application is compatible with [EVA ICS](https://www.eva-ics.com/) v4 only.
 
+Technical documentation: <https://info.bma.ai/en/actual/eva4/ecmui/index.html>
+
 ## Packages
 
 Release packages available at: https://pub.bma.ai/ecmui/
