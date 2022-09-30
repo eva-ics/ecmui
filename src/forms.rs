@@ -8,9 +8,9 @@ use crate::output;
 use crate::smart_table::FormattedValueColor;
 use crate::ui;
 use crate::CONTROLLER_SVC_PFX;
+use busrt::{DEFAULT_BUF_SIZE, DEFAULT_BUF_TTL, DEFAULT_QUEUE_SIZE};
 use chrono::{DateTime, Local, SecondsFormat};
 use cpp_core::Ptr;
-use elbus::{DEFAULT_BUF_SIZE, DEFAULT_BUF_TTL, DEFAULT_QUEUE_SIZE};
 use eva_common::prelude::*;
 use qt_charts::{QChart, QChartView, QLineSeries};
 use qt_core::{

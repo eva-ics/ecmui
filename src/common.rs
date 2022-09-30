@@ -241,19 +241,19 @@ fn default_bus_type() -> String {
 #[allow(clippy::cast_possible_truncation)]
 #[allow(clippy::cast_possible_wrap)]
 fn default_buf_size() -> i32 {
-    elbus::DEFAULT_BUF_SIZE as i32
+    busrt::DEFAULT_BUF_SIZE as i32
 }
 
 #[allow(clippy::cast_possible_truncation)]
 #[allow(clippy::cast_possible_wrap)]
 fn default_buf_ttl() -> i32 {
-    elbus::DEFAULT_BUF_TTL.as_micros() as i32
+    busrt::DEFAULT_BUF_TTL.as_micros() as i32
 }
 
 #[allow(clippy::cast_possible_truncation)]
 #[allow(clippy::cast_possible_wrap)]
 fn default_bus_queue_size() -> i32 {
-    elbus::DEFAULT_QUEUE_SIZE as i32
+    busrt::DEFAULT_QUEUE_SIZE as i32
 }
 
 fn default_bus_ping_interval() -> f64 {
@@ -282,11 +282,11 @@ impl Default for BusConfig {
     #[allow(clippy::cast_possible_wrap)]
     fn default() -> Self {
         Self {
-            buf_size: elbus::DEFAULT_BUF_SIZE as i32,
-            buf_ttl: elbus::DEFAULT_BUF_TTL.as_micros() as i32,
+            buf_size: busrt::DEFAULT_BUF_SIZE as i32,
+            buf_ttl: busrt::DEFAULT_BUF_TTL.as_micros() as i32,
             path: default_bus_path(),
             ping_interval: DEFAULT_BUS_PING_INTERVAL_SEC,
-            queue_size: elbus::DEFAULT_QUEUE_SIZE as i32,
+            queue_size: busrt::DEFAULT_QUEUE_SIZE as i32,
             kind: default_bus_type(),
             timeout: None,
         }

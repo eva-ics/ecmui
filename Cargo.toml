@@ -1,6 +1,6 @@
 [package]
 name = "ecmui"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "EVA ICS Cloud Manager UI application"
 authors = ["Sergei S. <div@altertech.com>"]
@@ -8,6 +8,18 @@ license = "LGPL"
 repository = "https://github.com/eva-ics/ecmui"
 readme = "README.md"
 keywords = ["eva-ics", "automation", "cloud", "client"]
+
+[package.metadata.bundle]
+name = "ecmui"
+identifier = "com.bohemia-automation.ecmui"
+icon = ["ui/i/logo.png"]
+copyright = "Copyright (c) Bohemia Automation Ltd 2022. All rights reserved."
+short_description = "EVA ICS Cloud Manager UI"
+long_description = """
+Cloud Manager UI for EVA ICS v4 (https://www.eva-ics.com/) industrial
+automation cloud-SCADA platform
+"""
+deb_depends = ["libqt5charts5 (>= 5.12.0)", "libqt5widgets5 (>= 5.12.0)", "libqt5gui5 (>= 5.12.0)"]
 
 [dependencies]
 cpp_core = "0.6.0"
@@ -18,8 +30,8 @@ qt_ui_tools = "0.5.0"
 qt_charts = "0.5.0"
 lazy_static = "1.4.0"
 serde = { version = "1.0.139", features = ["derive"] }
-eva-common = { version = "0.1.166", features = ["logic", "common-payloads", "actions"] }
-eva-client = "0.1.5"
+eva-common = { version = "0.1.176", features = ["logic", "common-payloads", "actions"] }
+eva-client = "0.1.6"
 tokio = { version = "1.19.2", features = ["full"] }
 once_cell = "1.13.0"
 arboard = "2.1.1"
@@ -27,7 +39,7 @@ chrono = "0.4.19"
 directories = "4.0.1"
 serde_yaml = "0.8.25"
 bmart-derive = "0.1.3"
-elbus = "0.2.12"
+busrt = "0.3"
 uuid = { version = "1.1.2", features = ["serde", "v4"] }
 serde_json = "1.0.82"
 force-send-sync = "1.0.0"
@@ -43,15 +55,3 @@ winres = "0.1.12"
 strip = true
 lto = true
 codegen-units = 1
-
-[package.metadata.bundle]
-name = "ecmui"
-identifier = "com.bohemia-automation.ecmui"
-icon = ["ui/i/logo.png"]
-copyright = "Copyright (c) Bohemia Automation Ltd 2022. All rights reserved."
-short_description = "EVA ICS Cloud Manager UI"
-long_description = """
-Cloud Manager UI for EVA ICS v4 (https://www.eva-ics.com/) industrial
-automation cloud-SCADA platform
-"""
-deb_depends = ["libqt5charts5 (>= 5.12.0)", "libqt5widgets5 (>= 5.12.0)", "libqt5gui5 (>= 5.12.0)"]
