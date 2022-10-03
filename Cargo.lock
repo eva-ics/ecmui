@@ -494,9 +494,9 @@ dependencies = [
 
 [[package]]
 name = "eva-client"
-version = "0.1.6"
+version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "121173c9fb2194773cc32fa2ecb1c1c13162bf0250553dcef6b91b4e4c584112"
+checksum = "9882134b5bf18a11d3ab72bb28707e5cbe8d3fcf8c717cd0c9b23796267ae37a"
 dependencies = [
  "busrt",
  "eva-common",
@@ -509,9 +509,9 @@ dependencies = [
 
 [[package]]
 name = "eva-common"
-version = "0.1.176"
+version = "0.1.178"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "70bd0c7b80f09cfec9ee1234327e1c4ea3cf5c6dcf53cbb5ef4f6deb305d9ee3"
+checksum = "639c4b9fcef8938d9918e199918c1258f2f460321b437e8ab78cce55fa44e948"
 dependencies = [
  "async-recursion",
  "bmart",
