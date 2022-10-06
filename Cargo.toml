@@ -1,6 +1,6 @@
 [package]
 name = "ecmui"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 description = "EVA ICS Cloud Manager UI application"
 authors = ["Sergei S. <div@altertech.com>"]
