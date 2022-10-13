@@ -43,6 +43,7 @@ busrt = "0.3"
 uuid = { version = "1.1.2", features = ["serde", "v4"] }
 serde_json = "1.0.82"
 force-send-sync = "1.0.0"
+clap = { version = "4.0.14", features = ["derive"] }
 
 [build-dependencies]
 qt_ritual_build = "0.5.0"

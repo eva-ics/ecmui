@@ -1,6 +1,7 @@
 use crate::common::{
-    load_yaml, new_size, save_yaml, splitter_sizes, ActionFilter, ActionRecord, Config, ItemConfig,
-    LogFilter, Nit, NitData, NitKind, NodeInfo, SPointInfo, ServiceParams, SvcInfo, CRLF,
+    load_yaml, new_size, save_yaml, splitter_sizes, ActionFilter, ActionRecord, Args, Config,
+    ItemConfig, LogFilter, Nit, NitData, NitKind, NodeInfo, SPointInfo, ServiceParams, SvcInfo,
+    CRLF,
 };
 use crate::output;
 use crate::smart_table;
@@ -244,6 +245,7 @@ pub struct Ui {
     icon_services: CppBox<QIcon>,
     icon_spoints: CppBox<QIcon>,
     icon_action: CppBox<QIcon>,
+    args: Args,
 }
 
 impl StaticUpcast<QObject> for Ui {
@@ -261,7 +263,7 @@ unsafe fn qicon(id: &str) -> CppBox<QIcon> {
 }
 
 impl Ui {
-    pub fn new() -> Rc<Self> {
+    pub fn new(args: Args) -> Rc<Self> {
         unsafe {
             let (cmd_tx, cmd_rx) = mpsc_std::sync_channel::<Command>(32768);
             let cleanup_timer: QBox<QTimer> = QTimer::new_0a();
@@ -307,6 +309,7 @@ impl Ui {
                 icon_services: qicon("services"),
                 icon_spoints: qicon("spoints"),
                 icon_action: qicon("action"),
+                args,
             });
             this.init(cmd_tx);
             this.dialog_export.init(&this.slot_on_export_clicked());
@@ -2198,6 +2201,20 @@ If this is the node Cloud Manager is connected to, the session will be disconnec
         if !loaded {
             self.init_splitters();
         }
-        self.dialog_connect.show();
+        if let Some(opts) = self.args.connection_options() {
+            self.dialog_connect.set_data(opts.clone());
+            if (opts.path.starts_with("http://") || opts.path.starts_with("https://"))
+                && opts
+                    .credentials
+                    .as_ref()
+                    .map_or(true, |creds| creds.1.is_empty())
+            {
+                self.dialog_connect.show();
+            } else {
+                bus::connect(opts);
+            }
+        } else {
+            self.dialog_connect.show();
+        }
     }
 }

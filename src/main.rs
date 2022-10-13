@@ -1,5 +1,6 @@
 #![windows_subsystem = "windows"]
 
+use clap::Parser;
 use cpp_core::CppBox;
 use directories::ProjectDirs;
 use lazy_static::lazy_static;
@@ -53,17 +54,18 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 unsafe fn main_icon() -> CppBox<QIcon> {
     let pixmap = QPixmap::new();
-    pixmap.load_1a(&qs(format!(":/i/logo.png")));
+    pixmap.load_1a(&qs(":/i/logo.png"));
     let icon = QIcon::new();
     icon.add_pixmap_1a(&pixmap);
     icon
 }
 
 fn main() {
+    let args = common::Args::parse();
     std::env::set_var("QT_AUTO_SCREEN_SCALE_FACTOR", "1");
     QApplication::init(|_| {
         q_init_resource!("resources");
-        let ui = ui::Ui::new();
+        let ui = ui::Ui::new(args);
         unsafe {
             ui.show();
             let icon = main_icon();

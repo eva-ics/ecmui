@@ -1,4 +1,5 @@
 use crate::ui;
+use clap::Parser;
 use cpp_core::CppBox;
 use eva_client::VersionInfo;
 use eva_common::prelude::*;
@@ -26,6 +27,45 @@ pub const DEFAULT_BUS_PING_INTERVAL_SEC: f64 = 1.0;
 pub const CRLF: &str = "\r\n";
 #[cfg(not(target_os = "windows"))]
 pub const CRLF: &str = "\n";
+
+#[derive(Parser)]
+pub struct Args {
+    #[clap(
+        short = 'C',
+        long = "connection-path",
+        help = "BUS/RT socket or HTTP API URL"
+    )]
+    connection_path: Option<String>,
+    #[clap(short = 'T', long = "timeout")]
+    connection_timeout: Option<f64>,
+    #[clap(short = 'U', long = "user")]
+    user: Option<String>,
+    #[clap(short = 'P', long = "password")]
+    password: Option<String>,
+}
+
+impl Args {
+    pub fn connection_options(&self) -> Option<ConnectionOptions> {
+        self.connection_path.as_ref().map(|path| ConnectionOptions {
+            path: if let Some(p) = path.strip_prefix("rt://") {
+                p.to_owned()
+            } else {
+                path.clone()
+            },
+            credentials: self.user.as_ref().map(|user| {
+                (
+                    user.clone(),
+                    self.password
+                        .as_ref()
+                        .map_or_else(<_>::default, Clone::clone),
+                )
+            }),
+            timeout: Duration::from_secs_f64(
+                self.connection_timeout.unwrap_or(DEFAULT_TIMEOUT_SEC),
+            ),
+        })
+    }
+}
 
 pub unsafe fn new_size(x: c_int, y: c_int) -> CppBox<QListOfInt> {
     let sizes = QListOfInt::new();
