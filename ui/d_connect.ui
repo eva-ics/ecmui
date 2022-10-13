@@ -135,7 +135,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>&amp;Login</string>
+    <string>&amp;User</string>
    </property>
    <property name="buddy">
     <cstring>login</cstring>
@@ -167,10 +167,10 @@
     </rect>
    </property>
    <property name="text">
-    <string>Timeout, sec</string>
+    <string>&amp;Timeout, sec</string>
    </property>
    <property name="buddy">
-    <cstring>password</cstring>
+    <cstring>timeout</cstring>
    </property>
   </widget>
   <widget class="QSpinBox" name="timeout">
