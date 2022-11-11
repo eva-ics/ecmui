@@ -241,6 +241,8 @@ pub struct ServiceParams {
     #[serde(default)]
     pub react_to_fail: bool,
     #[serde(default)]
+    pub call_tracing: bool,
+    #[serde(default)]
     pub user: Option<String>,
     #[serde(default)]
     pub config: Value,

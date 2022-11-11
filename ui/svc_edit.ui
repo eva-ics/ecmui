@@ -10,19 +10,19 @@
     <x>0</x>
     <y>0</y>
     <width>560</width>
-    <height>420</height>
+    <height>450</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>560</width>
-    <height>420</height>
+    <height>450</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>560</width>
-    <height>420</height>
+    <height>450</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -36,7 +36,7 @@
    <property name="geometry">
     <rect>
      <x>210</x>
-     <y>377</y>
+     <y>407</y>
      <width>341</width>
      <height>32</height>
     </rect>
@@ -54,7 +54,7 @@
      <x>0</x>
      <y>0</y>
      <width>561</width>
-     <height>371</height>
+     <height>391</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -73,7 +73,7 @@
        <x>10</x>
        <y>10</y>
        <width>541</width>
-       <height>321</height>
+       <height>342</height>
       </rect>
      </property>
      <layout class="QFormLayout" name="formLayout">
@@ -265,6 +265,13 @@
        <widget class="QCheckBox" name="i_enabled">
         <property name="text">
          <string>&amp;Enabled</string>
+        </property>
+       </widget>
+      </item>
+      <item row="11" column="0">
+       <widget class="QCheckBox" name="i_call_tracing">
+        <property name="text">
+         <string>Call tracin&amp;g</string>
         </property>
        </widget>
       </item>
@@ -474,7 +481,7 @@
    <property name="geometry">
     <rect>
      <x>116</x>
-     <y>377</y>
+     <y>407</y>
      <width>28</width>
      <height>22</height>
     </rect>
@@ -487,7 +494,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>380</y>
+     <y>410</y>
      <width>101</width>
      <height>16</height>
     </rect>
@@ -511,7 +518,9 @@
   <tabstop>i_workers</tabstop>
   <tabstop>i_user</tabstop>
   <tabstop>i_launcher</tabstop>
+  <tabstop>i_enabled</tabstop>
   <tabstop>i_react_to_fail</tabstop>
+  <tabstop>i_call_tracing</tabstop>
   <tabstop>btn_load_tpl</tabstop>
   <tabstop>i_config</tabstop>
   <tabstop>i_bus_type</tabstop>
