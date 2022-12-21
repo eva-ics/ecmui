@@ -2075,13 +2075,7 @@ If this is the node Cloud Manager is connected to, the session will be disconnec
         }
     }
     unsafe fn process_action_nit(self: &Rc<Self>, nit: Nit) {
-        self.ui_action(move || {
-            if let Err(e) = bus::call::<Value>(nit.clone()) {
-                Err(e)
-            } else {
-                Ok(nit.to_string())
-            }
-        });
+        self.ui_action(move || Ok(bus::call::<Value>(nit.clone())?.to_string()));
     }
     pub unsafe fn default_error_box<E: fmt::Display>(self: &Rc<Self>, msg: E) {
         self.error_box(None::<&str>, msg);

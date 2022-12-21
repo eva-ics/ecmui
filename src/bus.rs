@@ -87,7 +87,7 @@ async fn launch_connection(
     creds: Option<(String, String)>,
 ) {
     crate::CLIENT_CHANNEL.lock().unwrap().take();
-    set_status(&format!("Connecting to {path}..."), StatusKind::Info);
+    set_status(format!("Connecting to {path}..."), StatusKind::Info);
     macro_rules! set_err {
         ($e: expr) => {
             set_status(

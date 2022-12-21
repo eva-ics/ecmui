@@ -925,7 +925,7 @@ impl fmt::Display for NitKind {
 }
 
 pub fn nd_from_path(path: &[&str]) -> Option<NitData> {
-    if let Some(node_name) = path.get(0) {
+    if let Some(node_name) = path.first() {
         match path.get(1) {
             #[allow(clippy::match_single_binding)]
             Some(node_leaf) => match *node_leaf {
