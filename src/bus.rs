@@ -469,8 +469,21 @@ async fn do_process_command(client: Arc<EvaCloudClient>, nit: Nit) -> EResult<Va
                 )
                 .await
         }
+        NitKind::SvcGetInfo(svc) => client.call(nit.node(), svc, "info", None).await,
+        NitKind::SvcCall(u, svc, method, payload) => {
+            let node = nit.node().to_owned();
+            let u = *u;
+            let svc = svc.clone();
+            let method = method.clone();
+            let payload = payload.clone();
+            tokio::spawn(async move {
+                let result = client.call(&node, &svc, &method, payload).await;
+                ui::command(ui::Command::ProcessSvcCallResult(u, result));
+            });
+            Ok(Value::Unit)
+        }
         NitKind::ItemGetConfigX(oid) => {
-            let svcs = client
+            let items = client
                 .call::<Value>(nit.node(), SVC_CORE, "svc.list", None)
                 .await?;
             let params = s_call(
@@ -481,7 +494,7 @@ async fn do_process_command(client: Arc<EvaCloudClient>, nit: Nit) -> EResult<Va
                 ParamsId { i: oid },
             )
             .await?;
-            Ok(Value::Seq(vec![params, svcs]))
+            Ok(Value::Seq(vec![params, items]))
         }
         NitKind::ItemDeploySingle(config) => {
             client

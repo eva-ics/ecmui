@@ -1,7 +1,7 @@
 use crate::common::{
     load_yaml, new_size, save_yaml, splitter_sizes, ActionFilter, ActionRecord, Args, Config,
-    ItemConfig, LogFilter, Nit, NitData, NitKind, NodeInfo, SPointInfo, ServiceParams, SvcInfo,
-    CRLF,
+    ItemConfig, LogFilter, Nit, NitData, NitKind, NodeInfo, SPointInfo, ServiceParams, SvcData,
+    SvcInfo, CRLF,
 };
 use crate::output;
 use crate::smart_table;
@@ -70,6 +70,7 @@ pub enum Command {
     ProcessNit(Nit),
     ProcessItemWatch(uuid::Uuid, Value),
     ProcessActionWatch(uuid::Uuid, Value),
+    ProcessSvcCallResult(uuid::Uuid, EResult<Value>),
 }
 
 struct NodeTreeItem {
@@ -236,6 +237,7 @@ pub struct Ui {
     item_edit_dialogs: forms::DialogFactory<forms::DialogItemEdit>,
     item_watch_dialogs: forms::InfoDialogFactory<forms::DialogItemWatch>,
     action_watch_dialogs: forms::InfoDialogFactory<forms::DialogActionWatch>,
+    svc_call_dialogs: forms::InfoDialogFactory<forms::DialogSvcCall>,
     icon_stop: CppBox<QIcon>,
     icon_start: CppBox<QIcon>,
     icon_node: CppBox<QIcon>,
@@ -300,6 +302,7 @@ impl Ui {
                 item_edit_dialogs: <_>::default(),
                 item_watch_dialogs: <_>::default(),
                 action_watch_dialogs: <_>::default(),
+                svc_call_dialogs: <_>::default(),
                 icon_stop: qicon("stop"),
                 icon_start: qicon("start"),
                 icon_node: qicon("node"),
@@ -370,12 +373,20 @@ impl Ui {
         while let Ok(cmd) = self.cmd_rx.try_recv() {
             match cmd {
                 Command::ProcessItemWatch(u, data) => {
-                    if !self.window.widget.is_visible() || !self.item_watch_dialogs.push(u, data) {
+                    if !self.window.widget.is_visible()
+                        || !self.item_watch_dialogs.push(u, Ok(data))
+                    {
+                        let _r = bus::call::<()>(Arc::new(NitData::stop_watcher(u)));
+                    }
+                }
+                Command::ProcessSvcCallResult(u, data) => {
+                    if !self.window.widget.is_visible() || !self.svc_call_dialogs.push(u, data) {
                         let _r = bus::call::<()>(Arc::new(NitData::stop_watcher(u)));
                     }
                 }
                 Command::ProcessActionWatch(u, data) => {
-                    if !self.window.widget.is_visible() || !self.action_watch_dialogs.push(u, data)
+                    if !self.window.widget.is_visible()
+                        || !self.action_watch_dialogs.push(u, Ok(data))
                     {
                         let _r = bus::call::<()>(Arc::new(NitData::stop_watcher(u)));
                     }
@@ -709,7 +720,7 @@ impl Ui {
                 }
                 NitKind::Items(_, _) => {
                     let nit_sp = Arc::new(NitData::new_services(nd.node()));
-                    if let Ok(svcs) = bus::call::<Vec<SvcInfo>>(nit_sp) {
+                    if let Ok(svcs) = bus::call::<Vec<SvcData>>(nit_sp) {
                         let dialog = Rc::new(forms::DialogItemEdit::load());
                         dialog.init();
                         let this = self.clone();
@@ -1303,6 +1314,21 @@ If this is the node Cloud Manager is connected to, the session will be disconnec
             Err(e) => self.error("Failed to get service params", e),
         }
     }
+    unsafe fn svc_call_method(self: &Rc<Self>, node: &str, svc: String) {
+        match bus::call::<Value>(Arc::new(NitData::new_svc_get_info(node, svc.clone()))) {
+            Ok(val) => match SvcInfo::deserialize(val) {
+                Ok(info) => {
+                    let dialog = Rc::new(forms::DialogSvcCall::new(&svc, node, info));
+                    dialog.show();
+                    let d = dialog.clone();
+                    let u = self.svc_call_dialogs.register(dialog);
+                    d.set_uuid(u);
+                }
+                Err(e) => self.error("Failed to parse service info", e),
+            },
+            Err(e) => self.error("Failed to get service info", e),
+        }
+    }
     unsafe fn ctx_svcs(
         self: &Rc<Self>,
         svcs: Vec<String>,
@@ -1310,6 +1336,7 @@ If this is the node Cloud Manager is connected to, the session will be disconnec
         pos: CppBox<QPoint>,
         node: &str,
     ) {
+        const CA_CALL: &str = "svc_ca_call";
         const CA_EDIT: &str = "svc_ca_edit";
         const CA_EXPORT: &str = "svc_ca_export";
         const CA_IMPORT: &str = "svc_ca_import";
@@ -1317,6 +1344,10 @@ If this is the node Cloud Manager is connected to, the session will be disconnec
         const CA_DESTROY: &str = "svc_ca_destroy";
         const CA_PURGE: &str = "svc_ca_purge";
         let menu = QMenu::new();
+        let action_call = QAction::new();
+        action_call.set_object_name(&qs(CA_CALL));
+        action_call.set_text(&qs("&Call a method"));
+        menu.add_action(&action_call);
         let action_edit = QAction::new();
         action_edit.set_object_name(&qs(CA_EDIT));
         action_edit.set_text(&qs("&Edit"));
@@ -1347,6 +1378,9 @@ If this is the node Cloud Manager is connected to, the session will be disconnec
             return;
         }
         match selected.object_name().to_std_string().as_str() {
+            CA_CALL => {
+                self.svc_call_method(node, current_svc);
+            }
             CA_EDIT => {
                 self.svc_edit(node, current_svc);
             }
@@ -2038,7 +2072,7 @@ If this is the node Cloud Manager is connected to, the session will be disconnec
                     self.window.i_action_service.clear();
                     self.window.i_action_service.add_item_q_string(&qs(""));
                     let nit_svcs = Arc::new(NitData::new_services(nit.node()));
-                    if let Ok(svcs) = bus::call::<Vec<SvcInfo>>(nit_svcs) {
+                    if let Ok(svcs) = bus::call::<Vec<SvcData>>(nit_svcs) {
                         for svc in svcs {
                             if !curr_svc_exists
                                 && curr_svc.as_ref().map_or(false, |id| id == &svc.id)
@@ -2129,10 +2163,12 @@ If this is the node Cloud Manager is connected to, the session will be disconnec
             self.svc_edit_dialogs.close_all();
             self.item_edit_dialogs.close_all();
             self.item_watch_dialogs.close_all();
+            self.svc_call_dialogs.close_all();
         }
         self.svc_edit_dialogs.cleanup();
         self.item_edit_dialogs.cleanup();
         self.item_watch_dialogs.cleanup();
+        self.svc_call_dialogs.cleanup();
     }
     #[slot(SlotNoArgs)]
     unsafe fn on_action_connect(self: &Rc<Self>) {

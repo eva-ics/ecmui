@@ -538,11 +538,33 @@ pub struct NodeInfo {
 }
 
 #[derive(Deserialize, Clone)]
-pub struct SvcInfo {
+pub struct SvcData {
     pub id: String,
     pub launcher: String,
     pub status: String,
     pub pid: Option<u32>,
+}
+
+#[derive(Deserialize)]
+pub struct SvcInfo {
+    pub author: Option<String>,
+    pub description: Option<String>,
+    pub version: Option<String>,
+    #[serde(default)]
+    pub methods: BTreeMap<String, SvcMethodInfo>,
+}
+
+#[derive(Deserialize)]
+pub struct SvcMethodInfo {
+    pub description: Option<String>,
+    #[serde(default)]
+    pub params: BTreeMap<String, SvcMethodInfoParam>,
+}
+
+#[derive(Deserialize)]
+pub struct SvcMethodInfoParam {
+    #[serde(default)]
+    pub required: bool,
 }
 
 #[derive(Deserialize)]
@@ -694,6 +716,24 @@ impl NitData {
         Self {
             node: node.to_owned(),
             kind: NitKind::SvcGetParamsX(svc),
+        }
+    }
+    pub fn new_svc_get_info(node: &str, svc: String) -> Self {
+        Self {
+            node: node.to_owned(),
+            kind: NitKind::SvcGetInfo(svc),
+        }
+    }
+    pub fn new_svc_call(
+        u: uuid::Uuid,
+        node: &str,
+        svc: String,
+        method: String,
+        payload: Option<Value>,
+    ) -> Self {
+        Self {
+            node: node.to_owned(),
+            kind: NitKind::SvcCall(u, svc, method, payload),
         }
     }
     pub fn new_item_get_state(node: &str, oid: OID) -> Self {
@@ -891,6 +931,8 @@ pub enum NitKind {
     ItemGetConfigX(String),
     SvcDeploySingle(Box<ServiceParams>),
     SvcDeployMultiple(Vec<Value>),
+    SvcGetInfo(String),
+    SvcCall(uuid::Uuid, String, String, Option<Value>),
     SPoints,
     StartItemWatcher(uuid::Uuid, OID, Duration),
     StartActionWatcher(uuid::Uuid, uuid::Uuid, Duration), // second UUID = action UUID

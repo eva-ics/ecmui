@@ -1,11 +1,11 @@
 use crate::bus;
 use crate::common::{
-    self, ActionRecordFull, ConnectionOptions, ItemActionConfig, ItemConfig, ItemInfo,
-    ItemLogicConfig, ItemState, NitData, PayloadAction, PayloadLvarSet, SPointInfo, ServiceParams,
-    SvcInfo,
+    self, new_size, splitter_sizes, ActionRecordFull, ConnectionOptions, ItemActionConfig,
+    ItemConfig, ItemInfo, ItemLogicConfig, ItemState, NitData, PayloadAction, PayloadLvarSet,
+    SPointInfo, ServiceParams, SvcData, SvcInfo,
 };
 use crate::output;
-use crate::smart_table::FormattedValueColor;
+use crate::smart_table::{FormattedValue, FormattedValueColor, Table};
 use crate::ui;
 use crate::CONTROLLER_SVC_PFX;
 use busrt::{DEFAULT_BUF_SIZE, DEFAULT_BUF_TTL, DEFAULT_QUEUE_SIZE};
@@ -22,7 +22,7 @@ use qt_ui_tools::ui_form;
 use qt_widgets::{
     QAction, QCheckBox, QComboBox, QDialogButtonBox, QDoubleSpinBox, QFileDialog, QFormLayout,
     QGridLayout, QLabel, QLineEdit, QPlainTextEdit, QPushButton, QRadioButton, QSpinBox, QSplitter,
-    QTableWidget, QToolButton, QTreeWidget, QWidget,
+    QTabWidget, QTableWidget, QToolButton, QTreeWidget, QWidget,
 };
 use serde::Deserialize;
 use std::cell::RefCell;
@@ -32,6 +32,7 @@ use std::path::Path;
 use std::rc::Rc;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
+use std::time::Instant;
 
 const OUT_FILE: &str = "Select output file";
 pub const IN_FILE: &str = "Select input file";
@@ -353,7 +354,7 @@ impl Busy {
 pub trait NonModalInfoDialog {
     unsafe fn widget(&self) -> Ptr<QWidget>;
     fn btn_close(&self) -> &QPushButton;
-    unsafe fn push(&self, data: Value);
+    unsafe fn push(&self, data: EResult<Value>);
     unsafe fn close(&self);
 }
 
@@ -393,7 +394,7 @@ where
         );
         uuid
     }
-    pub unsafe fn push(&self, u: uuid::Uuid, data: Value) -> bool {
+    pub unsafe fn push(&self, u: uuid::Uuid, data: EResult<Value>) -> bool {
         let mut reg = self.object_registry.lock().unwrap();
         if let Some(i) = reg.get(&u) {
             if i.dialog.widget().is_visible() {
@@ -893,7 +894,7 @@ impl DialogItemEdit {
     }
     #[allow(clippy::cast_possible_truncation)]
     #[allow(clippy::cast_possible_wrap)]
-    pub unsafe fn show_add(self: &Rc<Self>, node: &str, services: Vec<SvcInfo>) {
+    pub unsafe fn show_add(self: &Rc<Self>, node: &str, services: Vec<SvcData>) {
         let kind = "sensor:";
         self.handle_oid_kind(kind);
         self.i_kind.set_current_text(&qs(kind));
@@ -923,7 +924,7 @@ impl DialogItemEdit {
         self: &Rc<Self>,
         node: &str,
         config: ItemConfig,
-        services: Vec<SvcInfo>,
+        services: Vec<SvcData>,
     ) {
         let kind = format!("{}:", config.oid.kind());
         self.handle_oid_kind(&kind);
@@ -1448,9 +1449,16 @@ impl NonModalInfoDialog for DialogActionWatch {
     fn btn_close(&self) -> &QPushButton {
         &self.qdialog.btn_close
     }
-    unsafe fn push(&self, data: Value) {
-        if let Err(e) = self.process_data(data) {
-            eprintln!("{}", e);
+    unsafe fn push(&self, data: EResult<Value>) {
+        match data {
+            Ok(v) => {
+                if let Err(e) = self.process_data(v) {
+                    eprintln!("{}", e);
+                }
+            }
+            Err(e) => {
+                eprintln!("{}", e);
+            }
         }
     }
     unsafe fn close(&self) {
@@ -1611,10 +1619,432 @@ impl NonModalInfoDialog for DialogItemWatch {
     fn btn_close(&self) -> &QPushButton {
         &self.qdialog.btn_close
     }
-    unsafe fn push(&self, data: Value) {
-        if let Err(e) = self.process_data(data) {
-            eprintln!("{}", e);
+    unsafe fn push(&self, data: EResult<Value>) {
+        match data {
+            Ok(v) => {
+                if let Err(e) = self.process_data(v) {
+                    eprintln!("{}", e);
+                }
+            }
+            Err(e) => {
+                eprintln!("{}", e);
+            }
         }
+    }
+    unsafe fn close(&self) {
+        self.qdialog.widget.close();
+    }
+}
+
+#[ui_form("../ui/svc_call.ui")]
+struct QDialogSvcCall {
+    pub(crate) widget: QBox<QWidget>,
+    tabs: QPtr<QTabWidget>,
+    tabs_result: QPtr<QTabWidget>,
+    btn_call: QPtr<QPushButton>,
+    btn_clear: QPtr<QPushButton>,
+    btn_close: QPtr<QPushButton>,
+    i_svc_id: QPtr<QLineEdit>,
+    i_svc_author: QPtr<QLineEdit>,
+    i_svc_description: QPtr<QLineEdit>,
+    i_svc_version: QPtr<QLineEdit>,
+    i_custom_method: QPtr<QLineEdit>,
+    i_payload: QPtr<QPlainTextEdit>,
+    i_method: QPtr<QComboBox>,
+    gl_params: QPtr<QGridLayout>,
+    status: QPtr<QLabel>,
+    splitter: QPtr<QSplitter>,
+    tbl_result: QPtr<QTableWidget>,
+    json_result: QPtr<QPlainTextEdit>,
+}
+
+impl QDialogSvcCall {
+    unsafe fn clear_result(&self) {
+        self.tbl_result.set_row_count(0);
+        self.tbl_result.set_column_count(0);
+        self.json_result.clear();
+    }
+    #[allow(clippy::too_many_lines)]
+    unsafe fn svc_call(
+        &self,
+        u: &Mutex<Option<uuid::Uuid>>,
+        items: &Mutex<Option<Vec<crate::smart_table::Item>>>,
+        id: &str,
+        node: &str,
+        params: &Mutex<Vec<SvcCallParam>>,
+    ) {
+        macro_rules! err {
+            ($msg: expr) => {
+                items.lock().unwrap().take();
+                self.clear_result();
+                self.tabs_result.set_current_index(0);
+                self.error(&$msg);
+                return;
+            };
+        }
+        self.set_status("Running...");
+        let (method, payload) = if self.tabs.current_index() == 0 {
+            let p = params.lock().unwrap();
+            (
+                self.i_method.current_text().to_std_string(),
+                if p.is_empty() {
+                    None
+                } else {
+                    let mut payload: BTreeMap<Value, Value> = <_>::default();
+                    for param in p.iter() {
+                        let name = param.name.clone();
+                        let val_str = param.value.text().to_std_string();
+                        if !val_str.is_empty() {
+                            match param.kind.current_text().to_std_string().as_str() {
+                                "float" => match val_str.parse::<f64>() {
+                                    Ok(val) => {
+                                        payload.insert(Value::String(name), Value::F64(val));
+                                    }
+                                    Err(e) => {
+                                        err!(format!("Unable to parse the param {}: {}", name, e));
+                                    }
+                                },
+                                "integer" => match val_str.parse::<u64>() {
+                                    Ok(val) => {
+                                        payload.insert(Value::String(name), Value::U64(val));
+                                    }
+                                    Err(_) => match val_str.parse::<i64>() {
+                                        Ok(val) => {
+                                            payload.insert(Value::String(name), Value::I64(val));
+                                        }
+                                        Err(e) => {
+                                            err!(format!(
+                                                "Unable to parse the param {}: {}",
+                                                name, e
+                                            ));
+                                        }
+                                    },
+                                },
+                                "string" => {
+                                    payload.insert(Value::String(name), Value::String(val_str));
+                                }
+                                "JSON" => match serde_json::from_str(&val_str) {
+                                    Ok(val) => {
+                                        payload.insert(Value::String(name), val);
+                                    }
+                                    Err(e) => {
+                                        err!(format!("Unable to parse the param {}: {}", name, e));
+                                    }
+                                },
+                                _ => match val_str.parse::<Value>() {
+                                    Ok(val) => {
+                                        payload.insert(Value::String(name), val);
+                                    }
+                                    Err(e) => {
+                                        err!(format!("Unable to parse the param {}: {}", name, e));
+                                    }
+                                },
+                            }
+                        }
+                    }
+                    Some(Value::Map(payload))
+                },
+            )
+        } else {
+            let pl = self.i_payload.to_plain_text().to_std_string();
+            let payload = pl.trim();
+            (
+                self.i_custom_method.text().to_std_string(),
+                if payload.is_empty() {
+                    None
+                } else {
+                    Some(match serde_yaml::from_str::<Value>(payload) {
+                        Ok(v) => v,
+                        Err(e) => {
+                            err!(format!("Unable to parse payload: {e}"));
+                        }
+                    })
+                },
+            )
+        };
+        if let Some(u) = u.lock().unwrap().as_ref() {
+            let nit = Arc::new(NitData::new_svc_call(
+                *u,
+                node,
+                id.to_owned(),
+                method,
+                payload,
+            ));
+            let _r = bus::call::<()>(nit);
+        } else {
+            err!("dialog not registered");
+        }
+    }
+    unsafe fn set_status(&self, text: &str) {
+        self.status.set_text(&qs(text));
+    }
+    unsafe fn error(&self, text: &str) {
+        self.status.set_text(&qs(format!(
+            "<span style=\"color: red; font-weight: bold\">{text}</span>"
+        )));
+    }
+}
+
+pub struct DialogSvcCall {
+    qdialog: Rc<QDialogSvcCall>,
+    _id: String,
+    _node: String,
+    _info: Rc<SvcInfo>,
+    _params: Rc<Mutex<Vec<SvcCallParam>>>,
+    op: Rc<Mutex<Option<Instant>>>,
+    u: Rc<Mutex<Option<uuid::Uuid>>>,
+    items: Rc<Mutex<Option<Vec<crate::smart_table::Item>>>>,
+}
+
+struct SvcCallParam {
+    name: String,
+    _label: QBox<QLabel>,
+    value: QBox<QLineEdit>,
+    kind: QBox<QComboBox>,
+}
+
+impl DialogSvcCall {
+    #[allow(clippy::cast_possible_truncation)]
+    #[allow(clippy::cast_possible_wrap)]
+    #[allow(clippy::too_many_lines)]
+    pub unsafe fn new(id: &str, node: &str, info: SvcInfo) -> Self {
+        let dialog = Rc::new(QDialogSvcCall::load());
+        let op: Rc<Mutex<Option<Instant>>> = <_>::default();
+        //dialog.tbl_result.hide();
+        let info = Rc::new(info);
+        let u: Rc<Mutex<Option<uuid::Uuid>>> = <_>::default();
+        let params: Rc<Mutex<Vec<SvcCallParam>>> = <_>::default();
+        let items: Rc<Mutex<Option<Vec<crate::smart_table::Item>>>> = <_>::default();
+        dialog
+            .widget
+            .set_window_title(&qs(format!("Service call {node}/{id}")));
+        dialog.i_svc_id.set_text(&qs(id));
+        set_opt_str!(&info.author, dialog.i_svc_author, "");
+        set_opt_str!(&info.description, dialog.i_svc_description, "");
+        set_opt_str!(&info.version, dialog.i_svc_version, "");
+        let d = dialog.clone();
+        let p = params.clone();
+        let svc_id = id.to_owned();
+        let svc_node = node.to_owned();
+        let op_c = op.clone();
+        let u_c = u.clone();
+        let items_c = items.clone();
+        dialog
+            .btn_call
+            .clicked()
+            .connect(&SlotNoArgs::new(&dialog.widget, move || {
+                op_c.lock().unwrap().replace(Instant::now());
+                d.svc_call(&u_c, &items_c, &svc_id, &svc_node, &p);
+            }));
+        let d = dialog.clone();
+        let p = params.clone();
+        dialog
+            .btn_clear
+            .clicked()
+            .connect(&SlotNoArgs::new(&dialog.widget, move || {
+                d.i_custom_method.clear();
+                d.i_payload.clear();
+                for param in p.lock().unwrap().iter() {
+                    param.value.clear();
+                    param.kind.set_current_text(&qs("auto"));
+                }
+            }));
+        dialog.i_method.clear();
+        dialog.i_method.add_item_q_string(&qs("test"));
+        for method in info.methods.keys() {
+            dialog.i_method.add_item_q_string(&qs(method));
+        }
+        let i = info.clone();
+        let p = params.clone();
+        let d = dialog.clone();
+        dialog.status.clear();
+        dialog
+            .i_method
+            .activated2()
+            .connect(&SlotNoArgs::new(&dialog.widget, move || {
+                let mut par = p.lock().unwrap();
+                while d.gl_params.count() > 1 {
+                    let widget = d.gl_params.item_at(0).widget();
+                    if !widget.is_null() {
+                        widget.hide();
+                    }
+                    d.gl_params.remove_widget(widget);
+                }
+                let spacer = d.gl_params.take_at(0);
+                par.clear();
+                if let Some(method_info) = i.methods.get(&d.i_method.current_text().to_std_string())
+                {
+                    for (row, (name, val)) in method_info.params.iter().enumerate() {
+                        let label = QLabel::new();
+                        if val.required {
+                            label.set_text(&qs(format!(
+                                "<span style=\"font-weight: bold\">{name}</span>"
+                            )));
+                        } else {
+                            label.set_text(&qs(name));
+                        }
+                        let value = QLineEdit::new();
+                        let kind = QComboBox::new_0a();
+                        kind.add_item_q_string(&qs("auto"));
+                        kind.add_item_q_string(&qs("float"));
+                        kind.add_item_q_string(&qs("integer"));
+                        kind.add_item_q_string(&qs("string"));
+                        kind.add_item_q_string(&qs("JSON"));
+                        d.gl_params.add_widget_3a(&label, row as i32, 0);
+                        d.gl_params.add_widget_3a(&value, row as i32, 1);
+                        d.gl_params.add_widget_3a(&kind, row as i32, 2);
+                        par.push(SvcCallParam {
+                            name: name.clone(),
+                            _label: label,
+                            value,
+                            kind,
+                        });
+                    }
+                }
+                d.gl_params.add_item(spacer);
+            }));
+        Self {
+            qdialog: dialog,
+            _id: id.to_owned(),
+            _node: node.to_owned(),
+            _info: info,
+            _params: params,
+            op,
+            u,
+            items,
+        }
+    }
+    pub fn set_uuid(&self, u: uuid::Uuid) {
+        self.u.lock().unwrap().replace(u);
+    }
+    pub unsafe fn show(&self) {
+        self.qdialog.widget.show();
+        if let Some((size_left, size_right)) = splitter_sizes(&self.qdialog.splitter) {
+            let size_total = size_left + size_right;
+            let size_left = size_total / 3;
+            let size_right = size_total / 3 * 2;
+            self.qdialog
+                .splitter
+                .set_sizes(&new_size(size_left, size_right));
+        }
+    }
+    #[allow(clippy::too_many_lines)]
+    pub unsafe fn process_data(&self, data: EResult<Value>) {
+        self.items.lock().unwrap().take();
+        self.qdialog.clear_result();
+        match data {
+            Ok(v) => {
+                if let Some(o) = self.op.lock().unwrap().as_ref() {
+                    self.qdialog
+                        .set_status(&format!("elapsed: {:?}", o.elapsed()));
+                } else {
+                    self.qdialog.set_status("ok");
+                }
+                match serde_json::to_string_pretty(&v) {
+                    Ok(v) => self.qdialog.json_result.set_plain_text(&qs(v)),
+                    Err(e) => self
+                        .qdialog
+                        .json_result
+                        .set_plain_text(&qs(format!("JSON error: {e}"))),
+                }
+                match v {
+                    Value::Seq(val) => {
+                        if !val.is_empty() {
+                            let cols: Vec<String>;
+                            let t_cols;
+                            let t = if let Value::Map(m) = &val[0] {
+                                cols = m.keys().map(ToString::to_string).collect();
+                                t_cols = cols.iter().map(String::as_str).collect::<Vec<&str>>();
+                                let mut t = Table::new(&t_cols);
+                                for row in &val {
+                                    if let Value::Map(m) = row {
+                                        t.append_row(m.values().map(FormattedValue::new).collect());
+                                    } else {
+                                        t.append_row(vec![FormattedValue::new(row)]);
+                                    }
+                                }
+                                t
+                            } else {
+                                let mut t = Table::new(&[" "]);
+                                for row in &val {
+                                    t.append_row(vec![FormattedValue::new(row)]);
+                                }
+                                t
+                            };
+                            self.items
+                                .lock()
+                                .unwrap()
+                                .replace(t.fill_qt(&self.qdialog.tbl_result));
+                        }
+                    }
+                    Value::Map(val) => {
+                        let mut t = Table::new(&["name", "value"]);
+                        for (k, v) in &val {
+                            t.append_row(vec![FormattedValue::new(k), FormattedValue::new(v)]);
+                        }
+                        self.items
+                            .lock()
+                            .unwrap()
+                            .replace(t.fill_qt(&self.qdialog.tbl_result));
+                    }
+                    _ => {
+                        let mut t = Table::new(&[" "]);
+                        let ok;
+                        if v == Value::Unit {
+                            ok = Value::String("OK".to_owned());
+                            t.append_row(vec![FormattedValue {
+                                color: FormattedValueColor::Green,
+                                value: &ok,
+                            }]);
+                        } else {
+                            t.append_row(vec![FormattedValue::new(&v)]);
+                        }
+                        self.items
+                            .lock()
+                            .unwrap()
+                            .replace(t.fill_qt(&self.qdialog.tbl_result));
+                    }
+                }
+            }
+            Err(e) => {
+                self.qdialog.tabs_result.set_current_index(0);
+                self.qdialog.error(&format!("{} ({})", e.kind(), e.code()));
+                let mut t = Table::new(&["error", "code", "message"]);
+                let kind = Value::String(e.kind().to_string());
+                let code = Value::I16(e.code());
+                let message = Value::String(e.message().unwrap_or_default().to_owned());
+                t.append_row(vec![
+                    FormattedValue {
+                        color: FormattedValueColor::Red,
+                        value: &kind,
+                    },
+                    FormattedValue {
+                        color: FormattedValueColor::Red,
+                        value: &code,
+                    },
+                    FormattedValue {
+                        color: FormattedValueColor::Red,
+                        value: &message,
+                    },
+                ]);
+                self.items
+                    .lock()
+                    .unwrap()
+                    .replace(t.fill_qt(&self.qdialog.tbl_result));
+            }
+        }
+    }
+}
+
+impl NonModalInfoDialog for DialogSvcCall {
+    unsafe fn widget(&self) -> Ptr<QWidget> {
+        self.qdialog.widget.as_ptr()
+    }
+    fn btn_close(&self) -> &QPushButton {
+        &self.qdialog.btn_close
+    }
+    unsafe fn push(&self, data: EResult<Value>) {
+        self.process_data(data);
     }
     unsafe fn close(&self) {
         self.qdialog.widget.close();

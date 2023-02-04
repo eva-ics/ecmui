@@ -1,6 +1,6 @@
 use crate::common::{
     spent_time, ActionRecord, BrokerInfo, ItemInfo, LogRecord, Nit, NitKind, NodeInfo, SPointInfo,
-    SvcInfo,
+    SvcData,
 };
 use crate::smart_table::{self, FormattedValue, FormattedValueColor};
 use crate::ui::Ui;
@@ -245,7 +245,7 @@ unsafe fn list_broker_clients(ui: &Rc<Ui>, data: BrokerInfo) {
     ui.primary_table_items.lock().unwrap().append(&mut items);
 }
 
-unsafe fn list_services(ui: &Rc<Ui>, data: Vec<SvcInfo>) {
+unsafe fn list_services(ui: &Rc<Ui>, data: Vec<SvcData>) {
     ui.clear_tables();
     ui.window.secondary_table.hide();
     let qt_table = &ui.window.primary_table;

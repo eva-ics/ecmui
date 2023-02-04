@@ -18,6 +18,15 @@ pub struct FormattedValue<'a> {
     pub value: &'a Value,
 }
 
+impl<'a> FormattedValue<'a> {
+    pub fn new(value: &'a Value) -> Self {
+        Self {
+            color: FormattedValueColor::Normal,
+            value,
+        }
+    }
+}
+
 #[allow(dead_code)]
 #[derive(Copy, Clone, Eq, PartialEq)]
 pub enum FormattedValueColor {
