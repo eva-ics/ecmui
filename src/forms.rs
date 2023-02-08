@@ -2,7 +2,7 @@ use crate::bus;
 use crate::common::{
     self, new_size, splitter_sizes, ActionRecordFull, ConnectionOptions, ItemActionConfig,
     ItemConfig, ItemInfo, ItemLogicConfig, ItemState, NitData, PayloadAction, PayloadLvarSet,
-    SPointInfo, ServiceParams, SvcData, SvcInfo,
+    SPointInfo, ServiceParams, SvcData, SvcInfo, SvcMethodInfoParam,
 };
 use crate::output;
 use crate::smart_table::{FormattedValue, FormattedValueColor, Table};
@@ -1874,7 +1874,13 @@ impl DialogSvcCall {
                 par.clear();
                 if let Some(method_info) = i.methods.get(&d.i_method.current_text().to_std_string())
                 {
-                    for (row, (name, val)) in method_info.params.iter().enumerate() {
+                    let mut params = method_info
+                        .params
+                        .iter()
+                        .map(|(k, v)| (k.as_str(), v))
+                        .collect::<Vec<(&str, &SvcMethodInfoParam)>>();
+                    params.sort_by_key(|k| !k.1.required);
+                    for (row, (name, val)) in params.into_iter().enumerate() {
                         let label = QLabel::new();
                         if val.required {
                             label.set_text(&qs(format!(
@@ -1894,7 +1900,7 @@ impl DialogSvcCall {
                         d.gl_params.add_widget_3a(&value, row as i32, 1);
                         d.gl_params.add_widget_3a(&kind, row as i32, 2);
                         par.push(SvcCallParam {
-                            name: name.clone(),
+                            name: name.to_owned(),
                             _label: label,
                             value,
                             kind,
