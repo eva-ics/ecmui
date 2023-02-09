@@ -2,7 +2,7 @@ use crate::bus;
 use crate::common::{
     self, new_size, splitter_sizes, ActionRecordFull, ConnectionOptions, ItemActionConfig,
     ItemConfig, ItemInfo, ItemLogicConfig, ItemState, NitData, PayloadAction, PayloadLvarSet,
-    SPointInfo, ServiceParams, SvcData, SvcInfo, SvcMethodInfoParam, CRLF,
+    SPointInfo, ServiceParams, SvcData, SvcInfo, SvcMethodInfoParam, copy_from_table,
 };
 use crate::output;
 use crate::smart_table::{FormattedValue, FormattedValueColor, Table};
@@ -29,7 +29,6 @@ use qt_widgets::{
 use serde::Deserialize;
 use std::cell::RefCell;
 use std::collections::{BTreeMap, HashMap};
-use std::fmt::Write;
 use std::os::raw::c_int;
 use std::path::Path;
 use std::rc::Rc;
@@ -2058,35 +2057,11 @@ impl DialogSvcCall {
     }
     #[slot(SlotNoArgs)]
     unsafe fn on_copy(self: &Rc<Self>) {
-        let table = &self.qdialog.tbl_result;
-            if !table.current_item().is_null() {
-                let mut result = String::new();
-                let items = table.selected_items();
-                let mut prev_row: Option<c_int> = None;
-                loop {
-                    if items.is_empty() {
-                        break;
-                    }
-                    let item = items.take_first();
-                    if item.is_null() {
-                        break;
-                    }
-                    let row = item.row();
-                    if let Some(prev) = prev_row {
-                        if row == prev {
-                            result += "\t";
-                        } else {
-                            result += CRLF;
-                            prev_row.replace(row);
-                        }
-                    } else {
-                        prev_row.replace(row);
-                    }
-                    write!(result, "{}", item.text().to_std_string()).unwrap();
-                }
-                let mut clipboard = Clipboard::new().unwrap();
-                clipboard.set_text(result).unwrap();
-            }
+        let result = copy_from_table(&[&self.qdialog.tbl_result]);
+        if !result.is_empty() {
+            let mut clipboard = Clipboard::new().unwrap();
+            clipboard.set_text(result).unwrap();
+        }
     }
 }
 
