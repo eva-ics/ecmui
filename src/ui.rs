@@ -1318,7 +1318,7 @@ If this is the node Cloud Manager is connected to, the session will be disconnec
         match bus::call::<Value>(Arc::new(NitData::new_svc_get_info(node, svc.clone()))) {
             Ok(val) => match SvcInfo::deserialize(val) {
                 Ok(info) => {
-                    let dialog = Rc::new(forms::DialogSvcCall::new(&svc, node, info));
+                    let dialog = forms::DialogSvcCall::new(&svc, node, info);
                     dialog.show();
                     let d = dialog.clone();
                     let u = self.svc_call_dialogs.register(dialog);
