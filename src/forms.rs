@@ -1640,7 +1640,7 @@ impl NonModalInfoDialog for DialogItemWatch {
 }
 
 #[ui_form("../ui/svc_call.ui")]
-pub(crate) struct QDialogSvcCall {
+struct QDialogSvcCall {
     pub(crate) widget: QBox<QWidget>,
     pub(crate) action_copy: QPtr<QAction>,
     tabs: QPtr<QTabWidget>,
@@ -1658,7 +1658,7 @@ pub(crate) struct QDialogSvcCall {
     gl_params: QPtr<QGridLayout>,
     status: QPtr<QLabel>,
     splitter: QPtr<QSplitter>,
-    pub(crate) tbl_result: QPtr<QTableWidget>,
+    tbl_result: QPtr<QTableWidget>,
     json_result: QPtr<QPlainTextEdit>,
 }
 
