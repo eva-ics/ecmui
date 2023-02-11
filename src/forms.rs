@@ -1,8 +1,8 @@
 use crate::bus;
 use crate::common::{
-    self, new_size, splitter_sizes, ActionRecordFull, ConnectionOptions, ItemActionConfig,
-    ItemConfig, ItemInfo, ItemLogicConfig, ItemState, NitData, PayloadAction, PayloadLvarSet,
-    SPointInfo, ServiceParams, SvcData, SvcInfo, SvcMethodInfoParam, copy_from_table,
+    self, copy_from_table, new_size, splitter_sizes, ActionRecordFull, ConnectionOptions,
+    ItemActionConfig, ItemConfig, ItemInfo, ItemLogicConfig, ItemState, NitData, PayloadAction,
+    PayloadLvarSet, SPointInfo, ServiceParams, SvcData, SvcInfo, SvcMethodInfoParam,
 };
 use crate::output;
 use crate::smart_table::{FormattedValue, FormattedValueColor, Table};
@@ -15,11 +15,12 @@ use cpp_core::{Ptr, StaticUpcast};
 use eva_common::prelude::*;
 use qt_charts::{QChart, QChartView, QLineSeries};
 use qt_core::{
-    qs, CheckState, QBox, QPtr, QVariant, SlotNoArgs, SlotOfBool, SlotOfDouble, SlotOfQString, slot, QObject
+    qs, slot, CheckState, QBox, QObject, QPtr, QVariant, SlotNoArgs, SlotOfBool, SlotOfDouble,
+    SlotOfQString,
 };
 use qt_gui::q_key_sequence::StandardKey;
 use qt_gui::q_painter::RenderHint;
-use qt_gui::{QColor, QPixmap, QKeySequence};
+use qt_gui::{QColor, QKeySequence, QPixmap};
 use qt_ui_tools::ui_form;
 use qt_widgets::{
     QAction, QCheckBox, QComboBox, QDialogButtonBox, QDoubleSpinBox, QFileDialog, QFormLayout,
@@ -1931,7 +1932,10 @@ impl DialogSvcCall {
         let this = Rc::new(this);
         let keybind = QKeySequence::key_bindings(StandardKey::Copy).take_first();
         this.qdialog.action_copy.set_shortcut(keybind.as_ref());
-        this.qdialog.action_copy.triggered().connect(&this.slot_on_copy());
+        this.qdialog
+            .action_copy
+            .triggered()
+            .connect(&this.slot_on_copy());
         this.qdialog.widget.add_action(&this.qdialog.action_copy);
         this
     }

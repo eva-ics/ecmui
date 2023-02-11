@@ -1,7 +1,7 @@
 use crate::common::{
-    load_yaml, new_size, save_yaml, splitter_sizes, ActionFilter, ActionRecord, Args, Config,
-    ItemConfig, LogFilter, Nit, NitData, NitKind, NodeInfo, SPointInfo, ServiceParams, SvcData,
-    SvcInfo, copy_from_table,
+    copy_from_table, load_yaml, new_size, save_yaml, splitter_sizes, ActionFilter, ActionRecord,
+    Args, Config, ItemConfig, LogFilter, Nit, NitData, NitKind, NodeInfo, SPointInfo,
+    ServiceParams, SvcData, SvcInfo,
 };
 use crate::output;
 use crate::smart_table;
