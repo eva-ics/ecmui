@@ -4,10 +4,11 @@ use cpp_core::CppBox;
 use eva_client::VersionInfo;
 use eva_common::prelude::*;
 use qt_core::{QListOfInt, QPtr};
-use qt_widgets::QSplitter;
+use qt_widgets::{QSplitter, QTableWidget};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::fmt;
+use std::fmt::Write as _;
 use std::io::{Read, Write};
 use std::os::raw::c_int;
 use std::path::Path;
@@ -1032,4 +1033,38 @@ pub fn spent_time(time: u64) -> String {
             time - days * 86400 - hours * 3600 - mins * 60
         )
     }
+}
+
+pub unsafe fn copy_from_table(tables: &[&QPtr<QTableWidget>]) -> String {
+    let mut result = String::default();
+    for table in tables {
+        if !table.current_item().is_null() {
+            let items = table.selected_items();
+            let mut prev_row: Option<c_int> = None;
+            loop {
+                if items.is_empty() {
+                    break;
+                }
+                let item = items.take_first();
+                if item.is_null() {
+                    break;
+                }
+                let row = item.row();
+                if let Some(prev) = prev_row {
+                    if row == prev {
+                        result += "\t";
+                    } else {
+                        result += CRLF;
+                        prev_row.replace(row);
+                    }
+                } else {
+                    prev_row.replace(row);
+                }
+                write!(result, "{}", item.text().to_std_string()).unwrap();
+            }
+            break;
+        }
+    }
+
+    result
 }

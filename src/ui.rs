@@ -1,7 +1,7 @@
 use crate::common::{
-    load_yaml, new_size, save_yaml, splitter_sizes, ActionFilter, ActionRecord, Args, Config,
-    ItemConfig, LogFilter, Nit, NitData, NitKind, NodeInfo, SPointInfo, ServiceParams, SvcData,
-    SvcInfo, CRLF,
+    copy_from_table, load_yaml, new_size, save_yaml, splitter_sizes, ActionFilter, ActionRecord,
+    Args, Config, ItemConfig, LogFilter, Nit, NitData, NitKind, NodeInfo, SPointInfo,
+    ServiceParams, SvcData, SvcInfo,
 };
 use crate::output;
 use crate::smart_table;
@@ -1318,7 +1318,7 @@ If this is the node Cloud Manager is connected to, the session will be disconnec
         match bus::call::<Value>(Arc::new(NitData::new_svc_get_info(node, svc.clone()))) {
             Ok(val) => match SvcInfo::deserialize(val) {
                 Ok(info) => {
-                    let dialog = Rc::new(forms::DialogSvcCall::new(&svc, node, info));
+                    let dialog = forms::DialogSvcCall::new(&svc, node, info);
                     dialog.show();
                     let d = dialog.clone();
                     let u = self.svc_call_dialogs.register(dialog);
@@ -1819,37 +1819,9 @@ If this is the node Cloud Manager is connected to, the session will be disconnec
     }
     #[slot(SlotNoArgs)]
     unsafe fn on_copy(self: &Rc<Self>) {
-        for table in [&self.window.primary_table, &self.window.secondary_table] {
-            if !table.current_item().is_null() {
-                let mut result = String::new();
-                let items = table.selected_items();
-                let mut prev_row: Option<c_int> = None;
-                loop {
-                    if items.is_empty() {
-                        break;
-                    }
-                    let item = items.take_first();
-                    if item.is_null() {
-                        break;
-                    }
-                    let row = item.row();
-                    if let Some(prev) = prev_row {
-                        if row == prev {
-                            result += "\t";
-                        } else {
-                            result += CRLF;
-                            prev_row.replace(row);
-                        }
-                    } else {
-                        prev_row.replace(row);
-                    }
-                    write!(result, "{}", item.text().to_std_string()).unwrap();
-                }
-                let mut clipboard = Clipboard::new().unwrap();
-                clipboard.set_text(result).unwrap();
-                break;
-            }
-        }
+        let result = copy_from_table(&[&self.window.primary_table, &self.window.secondary_table]);
+        let mut clipboard = Clipboard::new().unwrap();
+        clipboard.set_text(result).unwrap();
     }
     unsafe fn unselect_all(self: &Rc<Self>) {
         for table in [&self.window.primary_table, &self.window.secondary_table] {

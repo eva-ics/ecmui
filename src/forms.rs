@@ -1,23 +1,26 @@
 use crate::bus;
 use crate::common::{
-    self, new_size, splitter_sizes, ActionRecordFull, ConnectionOptions, ItemActionConfig,
-    ItemConfig, ItemInfo, ItemLogicConfig, ItemState, NitData, PayloadAction, PayloadLvarSet,
-    SPointInfo, ServiceParams, SvcData, SvcInfo, SvcMethodInfoParam,
+    self, copy_from_table, new_size, splitter_sizes, ActionRecordFull, ConnectionOptions,
+    ItemActionConfig, ItemConfig, ItemInfo, ItemLogicConfig, ItemState, NitData, PayloadAction,
+    PayloadLvarSet, SPointInfo, ServiceParams, SvcData, SvcInfo, SvcMethodInfoParam,
 };
 use crate::output;
 use crate::smart_table::{FormattedValue, FormattedValueColor, Table};
 use crate::ui;
 use crate::CONTROLLER_SVC_PFX;
+use arboard::Clipboard;
 use busrt::{DEFAULT_BUF_SIZE, DEFAULT_BUF_TTL, DEFAULT_QUEUE_SIZE};
 use chrono::{DateTime, Local, SecondsFormat};
-use cpp_core::Ptr;
+use cpp_core::{Ptr, StaticUpcast};
 use eva_common::prelude::*;
 use qt_charts::{QChart, QChartView, QLineSeries};
 use qt_core::{
-    qs, CheckState, QBox, QPtr, QVariant, SlotNoArgs, SlotOfBool, SlotOfDouble, SlotOfQString,
+    qs, slot, CheckState, QBox, QObject, QPtr, QVariant, SlotNoArgs, SlotOfBool, SlotOfDouble,
+    SlotOfQString,
 };
+use qt_gui::q_key_sequence::StandardKey;
 use qt_gui::q_painter::RenderHint;
-use qt_gui::{QColor, QPixmap};
+use qt_gui::{QColor, QKeySequence, QPixmap};
 use qt_ui_tools::ui_form;
 use qt_widgets::{
     QAction, QCheckBox, QComboBox, QDialogButtonBox, QDoubleSpinBox, QFileDialog, QFormLayout,
@@ -1639,6 +1642,7 @@ impl NonModalInfoDialog for DialogItemWatch {
 #[ui_form("../ui/svc_call.ui")]
 struct QDialogSvcCall {
     pub(crate) widget: QBox<QWidget>,
+    pub(crate) action_copy: QPtr<QAction>,
     tabs: QPtr<QTabWidget>,
     tabs_result: QPtr<QTabWidget>,
     btn_call: QPtr<QPushButton>,
@@ -1803,11 +1807,17 @@ struct SvcCallParam {
     kind: QBox<QComboBox>,
 }
 
+impl StaticUpcast<QObject> for DialogSvcCall {
+    unsafe fn static_upcast(ptr: Ptr<Self>) -> Ptr<QObject> {
+        ptr.qdialog.widget.as_ptr().static_upcast()
+    }
+}
+
 impl DialogSvcCall {
     #[allow(clippy::cast_possible_truncation)]
     #[allow(clippy::cast_possible_wrap)]
     #[allow(clippy::too_many_lines)]
-    pub unsafe fn new(id: &str, node: &str, info: SvcInfo) -> Self {
+    pub unsafe fn new(id: &str, node: &str, info: SvcInfo) -> Rc<Self> {
         let dialog = Rc::new(QDialogSvcCall::load());
         let op: Rc<Mutex<Option<Instant>>> = <_>::default();
         //dialog.tbl_result.hide();
@@ -1909,7 +1919,7 @@ impl DialogSvcCall {
                 }
                 d.gl_params.add_item(spacer);
             }));
-        Self {
+        let this = Self {
             qdialog: dialog,
             _id: id.to_owned(),
             _node: node.to_owned(),
@@ -1918,7 +1928,16 @@ impl DialogSvcCall {
             op,
             u,
             items,
-        }
+        };
+        let this = Rc::new(this);
+        let keybind = QKeySequence::key_bindings(StandardKey::Copy).take_first();
+        this.qdialog.action_copy.set_shortcut(keybind.as_ref());
+        this.qdialog
+            .action_copy
+            .triggered()
+            .connect(&this.slot_on_copy());
+        this.qdialog.widget.add_action(&this.qdialog.action_copy);
+        this
     }
     pub fn set_uuid(&self, u: uuid::Uuid) {
         self.u.lock().unwrap().replace(u);
@@ -2038,6 +2057,14 @@ impl DialogSvcCall {
                     .unwrap()
                     .replace(t.fill_qt(&self.qdialog.tbl_result));
             }
+        }
+    }
+    #[slot(SlotNoArgs)]
+    unsafe fn on_copy(self: &Rc<Self>) {
+        let result = copy_from_table(&[&self.qdialog.tbl_result]);
+        if !result.is_empty() {
+            let mut clipboard = Clipboard::new().unwrap();
+            clipboard.set_text(result).unwrap();
         }
     }
 }

@@ -409,6 +409,11 @@
     </widget>
    </item>
   </layout>
+  <action name="action_copy">
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
   <tabstop>tabs</tabstop>
