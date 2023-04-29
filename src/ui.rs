@@ -1075,7 +1075,7 @@ If this is the node Cloud Manager is connected to, the session will be disconnec
             let _r = write!(w, "<br>...and {} more", which.len() - MAX_CONFIRM);
         }
         self.confirm(&format!(
-            "The following {} going to be {}:<br><br>{}",
+            "The following {} will be {}:<br><br>{}",
             kind, op, w
         ))
     }
