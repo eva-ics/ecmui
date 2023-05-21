@@ -10,7 +10,7 @@ release: pkg upload-pkg
 
 upload-pkg:
 	gsutil -m cp -a public-read target/pkg/* gs://pub.bma.ai/ecmui/${VERSION}/
-	jks build pub.bma.ai
+	rci job run pub.bma.ai
 
 pkg: check-ver clean-pkg build-deb-u20 build-deb-u22 build-msi
 
