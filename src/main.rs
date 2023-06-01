@@ -61,6 +61,7 @@ unsafe fn main_icon() -> CppBox<QIcon> {
 }
 
 fn main() {
+    eva_common::self_test();
     let args = common::Args::parse();
     std::env::set_var("QT_AUTO_SCREEN_SCALE_FACTOR", "1");
     QApplication::init(|_| {

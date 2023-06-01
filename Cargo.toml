@@ -30,8 +30,8 @@ qt_ui_tools = "0.5.0"
 qt_charts = "0.5.0"
 lazy_static = "1.4.0"
 serde = { version = "1.0.139", features = ["derive"] }
-eva-common = { version = "0.1.179", features = ["logic", "common-payloads", "actions"] }
-eva-client = "0.1.7"
+eva-common = { version = "0.2.14", features = ["logic", "common-payloads", "actions"] }
+eva-client = "0.2.1"
 tokio = { version = "1.19.2", features = ["full"] }
 once_cell = "1.13.0"
 arboard = "2.1.1"
@@ -39,7 +39,7 @@ chrono = "0.4.19"
 directories = "4.0.1"
 serde_yaml = "0.8.25"
 bmart-derive = "0.1.3"
-busrt = "0.3"
+busrt = "0.4"
 uuid = { version = "1.1.2", features = ["serde", "v4"] }
 serde_json = "1.0.82"
 force-send-sync = "1.0.0"

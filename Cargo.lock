@@ -25,9 +25,9 @@ checksum = "aae1277d39aeec15cb388266ecc24b11c80469deae6067e17a1a7aa9e5c1f234"
 
 [[package]]
 name = "aho-corasick"
-version = "0.7.18"
+version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e37cfd5e7657ada45f742d6e99ca5788580b5c529dc78faf11ece6dc702656f"
+checksum = "67fc08ce920c31afb70f013dcce1bfc3a3195de6a228474e45e1f145b36f8d04"
 dependencies = [
  "memchr",
 ]
@@ -192,15 +192,16 @@ dependencies = [
 
 [[package]]
 name = "busrt"
-version = "0.3.2"
+version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "332aa46f450bed115c3055b4d855f511f17cdf22b224b1eae27a13584f802556"
+checksum = "03d7441e8cc7f8a0c4cc87e1653af1229e7b38368b1c10db4990fa5dd0c52f19"
 dependencies = [
  "async-channel",
  "async-io",
  "async-trait",
  "log",
  "parking_lot",
+ "regex",
  "rmp-serde",
  "serde",
  "serde-value",
@@ -531,9 +532,9 @@ dependencies = [
 
 [[package]]
 name = "eva-client"
-version = "0.1.7"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9882134b5bf18a11d3ab72bb28707e5cbe8d3fcf8c717cd0c9b23796267ae37a"
+checksum = "82647eb0bb045fa6e415ebdfab5445d549e576910338886175777d16478ed31a"
 dependencies = [
  "busrt",
  "eva-common",
@@ -546,9 +547,9 @@ dependencies = [
 
 [[package]]
 name = "eva-common"
-version = "0.1.179"
+version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3c9b040fde326c3843a47a39bdce8838888c0047e1cf7e18be4503356c84bdc5"
+checksum = "446f743e59e149dd1276a310ad7bb548ef48c0c7b2f8acc3292dc2a6e0267a6f"
 dependencies = [
  "async-recursion",
  "bmart",
@@ -569,9 +570,9 @@ dependencies = [
 
 [[package]]
 name = "eva-rjrpc"
-version = "0.1.15"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "97adf32d96a3406122f07c98275f5488ea3d9884edc76daa13d428c6daea15b5"
+checksum = "b6f81af72f8a510804dc39bf3493f632fc30ffdbf65ca8f6d5573d4b7e5f19a7"
 dependencies = [
  "eva-common",
  "hyper",
@@ -1577,9 +1578,9 @@ dependencies = [
 
 [[package]]
 name = "regex"
-version = "1.6.0"
+version = "1.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4c4eb3267174b8c6c2f654116623910a0fef09c4753f8dd83db29c48a0df988b"
+checksum = "81ca098a9821bd52d6b24fd8b10bd081f47d39c22778cafaa75a2857a62c6390"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -1588,9 +1589,9 @@ dependencies = [
 
 [[package]]
 name = "regex-syntax"
-version = "0.6.27"
+version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a3f87b73ce11b1619a3c6332f45341e0047173771e8b8b73f87bfeefb7b56244"
+checksum = "436b050e76ed2903236f032a59761c1eb99e1b0aead2c257922771dab1fc8c78"
 
 [[package]]
 name = "remove_dir_all"
