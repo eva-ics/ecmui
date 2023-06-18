@@ -1270,50 +1270,23 @@ pub struct QDialogLmacroRun {
 #[ui_form("../ui/unit_action.ui")]
 pub struct DialogUnitAction {
     pub(crate) widget: QBox<QWidget>,
-    c_value: QPtr<QCheckBox>,
-    i_status: QPtr<QSpinBox>,
     i_value: QPtr<QPlainTextEdit>,
     pub(crate) btn_box: QPtr<QDialogButtonBox>,
 }
 
 impl DialogUnitAction {
-    pub unsafe fn init(self: &Rc<Self>) {
-        let this = self.clone();
-        self.c_value
-            .clicked()
-            .connect(&SlotOfBool::new(&self.widget, move |checked| {
-                this.i_value.set_enabled(checked);
-            }));
-    }
     pub unsafe fn show(self: &Rc<Self>, state: Option<ItemState>) {
-        self.c_value.set_checked(false);
         if let Some(st) = state {
-            self.i_status.set_value(i32::from(st.status));
             self.i_value
                 .set_plain_text(&qs(output::format_value_pretty(st.value).to_string()));
         } else {
-            self.i_status.set_value(1);
             self.i_value.set_plain_text(&qs(""));
         }
-        self.i_value.set_enabled(false);
         self.widget.show();
     }
     pub unsafe fn parse_payload(self: &Rc<Self>) -> EResult<PayloadAction> {
-        let status = self
-            .i_status
-            .value()
-            .try_into()
-            .map_err(Error::invalid_data)?;
-        let value = if self.c_value.is_checked() {
-            if let Some(val) = self.i_value.gso() {
-                ValueOptionOwned::Value(val.parse()?)
-            } else {
-                ValueOptionOwned::Value(Value::Unit)
-            }
-        } else {
-            ValueOptionOwned::No
-        };
-        let params = eva_common::actions::UnitParams { status, value };
+        let value = self.i_value.gs().parse()?;
+        let params = eva_common::actions::UnitParams { value };
         Ok(PayloadAction {
             i: None,
             params: eva_common::actions::Params::Unit(params),

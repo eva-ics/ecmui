@@ -473,7 +473,7 @@ checksum = "453440c271cf5577fd2a40e4942540cb7d0d2f85e27c8d07dd0023c925a67541"
 
 [[package]]
 name = "ecmui"
-version = "0.1.4"
+version = "0.2.0"
 dependencies = [
  "arboard",
  "bmart-derive",
@@ -532,9 +532,9 @@ dependencies = [
 
 [[package]]
 name = "eva-client"
-version = "0.2.1"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "82647eb0bb045fa6e415ebdfab5445d549e576910338886175777d16478ed31a"
+checksum = "4e847c9126ca975d61aa11caf637752d17eb3d01b9dbc031fd13df050ef2a0d6"
 dependencies = [
  "busrt",
  "eva-common",
@@ -547,9 +547,9 @@ dependencies = [
 
 [[package]]
 name = "eva-common"
-version = "0.2.14"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "446f743e59e149dd1276a310ad7bb548ef48c0c7b2f8acc3292dc2a6e0267a6f"
+checksum = "b16e91b01274833ff90e46935276b29f32fcff5d61294688e17d315e7efc0aad"
 dependencies = [
  "async-recursion",
  "bmart",
@@ -570,9 +570,9 @@ dependencies = [
 
 [[package]]
 name = "eva-rjrpc"
-version = "0.2.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b6f81af72f8a510804dc39bf3493f632fc30ffdbf65ca8f6d5573d4b7e5f19a7"
+checksum = "94c3263f905d597f8ae117fcc9c1434f65685e9bd323ce8ab239c46adc79f1e7"
 dependencies = [
  "eva-common",
  "hyper",

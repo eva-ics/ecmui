@@ -277,7 +277,6 @@ impl Ui {
             let dialog_lvar_set = Rc::new(forms::DialogLvarSet::load());
             dialog_lvar_set.init();
             let dialog_unit_action = Rc::new(forms::DialogUnitAction::load());
-            dialog_unit_action.init();
             let this = Rc::new(Ui {
                 window,
                 dialog_connect: forms::DialogConnect::load(),

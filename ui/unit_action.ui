@@ -10,19 +10,19 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>300</height>
+    <height>280</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>400</width>
-    <height>300</height>
+    <height>280</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>400</width>
-    <height>300</height>
+    <height>280</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -35,8 +35,8 @@
   <widget class="QDialogButtonBox" name="btn_box">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>260</y>
+     <x>30</x>
+     <y>230</y>
      <width>341</width>
      <height>32</height>
     </rect>
@@ -51,60 +51,30 @@
   <widget class="QWidget" name="formLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>10</y>
+     <x>10</x>
+     <y>20</y>
      <width>361</width>
-     <height>241</height>
+     <height>201</height>
     </rect>
    </property>
    <layout class="QFormLayout" name="formLayout">
-    <item row="1" column="1">
-     <widget class="QSpinBox" name="i_status">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="minimum">
-       <number>-32768</number>
-      </property>
-      <property name="maximum">
-       <number>32768</number>
-      </property>
-      <property name="value">
-       <number>1</number>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QCheckBox" name="c_value">
-      <property name="text">
-       <string>&amp;Value</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QPlainTextEdit" name="i_value">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-     </widget>
-    </item>
     <item row="1" column="0">
      <widget class="QLabel" name="label">
       <property name="text">
-       <string>&amp;Status</string>
+       <string>Value</string>
       </property>
-      <property name="buddy">
-       <cstring>i_status</cstring>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QPlainTextEdit" name="i_value">
+      <property name="enabled">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
    </layout>
   </widget>
  </widget>
- <tabstops>
-  <tabstop>i_status</tabstop>
-  <tabstop>c_value</tabstop>
- </tabstops>
  <resources>
   <include location="resources.qrc"/>
  </resources>
