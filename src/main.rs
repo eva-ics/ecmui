@@ -64,6 +64,16 @@ fn main() {
     eva_common::self_test();
     let args = common::Args::parse();
     std::env::set_var("QT_AUTO_SCREEN_SCALE_FACTOR", "1");
+    unsafe {
+        qt_core::QCoreApplication::set_attribute_2a(
+            qt_core::ApplicationAttribute::AAEnableHighDpiScaling,
+            true,
+        );
+        qt_core::QCoreApplication::set_attribute_2a(
+            qt_core::ApplicationAttribute::AAUseHighDpiPixmaps,
+            true,
+        );
+    }
     QApplication::init(|_| {
         q_init_resource!("resources");
         let ui = ui::Ui::new(args);
