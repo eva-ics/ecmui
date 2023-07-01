@@ -165,9 +165,9 @@ checksum = "0d8c1fef690941d3e7788d328517591fecc684c084084702d6ff1641e993699a"
 
 [[package]]
 name = "bmart"
-version = "0.2.3"
+version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c76ffd528d0504b4d3c328e29e8d5451fffc890a16ba4f115181df2f77a8d401"
+checksum = "ddad030cdedba7c8fa6bb7b135745a110cb6b1fc5d0c46ed04238a592d6b7b39"
 dependencies = [
  "bmart-derive",
  "colored",
@@ -547,9 +547,9 @@ dependencies = [
 
 [[package]]
 name = "eva-common"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b16e91b01274833ff90e46935276b29f32fcff5d61294688e17d315e7efc0aad"
+checksum = "436218e07b25e9a43898492bf3919d9eb9be5b248110d781d3a2706a128be5fb"
 dependencies = [
  "async-recursion",
  "bmart",
@@ -1092,9 +1092,9 @@ dependencies = [
 
 [[package]]
 name = "ntapi"
-version = "0.3.7"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c28774a7fd2fbb4f0babd8237ce554b73af68021b5f695a3cebd6c59bac0980f"
+checksum = "e8a3895c6391c39d7fe7ebc444a87eb2991b2a0bc718fdabd071eec617fc68e4"
 dependencies = [
  "winapi 0.3.9",
 ]
@@ -1884,9 +1884,9 @@ dependencies = [
 
 [[package]]
 name = "sysinfo"
-version = "0.20.5"
+version = "0.29.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e223c65cd36b485a34c2ce6e38efa40777d31c4166d9076030c74cdcf971679f"
+checksum = "5bcd0346f90b6bc83526c7b180039a8acd26a5c848cc556d457f6472eb148122"
 dependencies = [
  "cfg-if",
  "core-foundation-sys",
