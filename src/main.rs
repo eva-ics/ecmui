@@ -27,6 +27,7 @@ use common::Nit;
 const UI_CLEANUP_INTERVAL: Duration = Duration::from_millis(500);
 const BUS_CLIENT_NAME: &str = "ecmui";
 const CONTROLLER_SVC_PFX: &str = "eva.controller.";
+const AAA_SVC_PFX: &str = "eva.aaa.";
 
 lazy_static! {
     static ref CLIENT_CHANNEL: Mutex<Option<bus::CommandTx>> = <_>::default();

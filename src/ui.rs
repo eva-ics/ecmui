@@ -1,7 +1,7 @@
 use crate::common::{
     copy_from_table, load_yaml, new_size, save_yaml, splitter_sizes, ActionFilter, ActionRecord,
     Args, Config, ItemConfig, LogFilter, Nit, NitData, NitKind, NodeInfo, SPointInfo,
-    ServiceParams, SvcData, SvcInfo,
+    ServiceParams, SvcData, SvcInfo, UsersFilter,
 };
 use crate::output;
 use crate::smart_table;
@@ -247,6 +247,7 @@ pub struct Ui {
     icon_services: CppBox<QIcon>,
     icon_spoints: CppBox<QIcon>,
     icon_action: CppBox<QIcon>,
+    icon_users: CppBox<QIcon>,
     args: Args,
 }
 
@@ -311,6 +312,7 @@ impl Ui {
                 icon_services: qicon("services"),
                 icon_spoints: qicon("spoints"),
                 icon_action: qicon("action"),
+                icon_users: qicon("action"),
                 args,
             });
             this.init(cmd_tx);
@@ -422,6 +424,7 @@ impl Ui {
                         item.add("log", &self.icon_log);
                         item.add("services", &self.icon_services);
                         item.add("spoints", &self.icon_spoints);
+                        item.add("users", &self.icon_users);
                         tree_items.insert(node.name, item);
                         first = false;
                     }
@@ -589,6 +592,7 @@ impl Ui {
         self.set_item_filter(false);
         self.set_log_filter(false);
         self.set_action_filter(false);
+        self.set_user_filter(false);
         self.window.i_log_level.set_current_text(&qs("info"));
         self.window
             .action_import_resource
@@ -1928,6 +1932,10 @@ If this is the node Cloud Manager is connected to, the session will be disconnec
         self.window.label_log_level.set_visible(visible);
         self.window.i_log_level.set_visible(visible);
     }
+    unsafe fn set_user_filter(self: &Rc<Self>, visible: bool) {
+        self.window.label_user_service.set_visible(visible);
+        self.window.i_user_service.set_visible(visible);
+    }
     unsafe fn set_action_filter(self: &Rc<Self>, visible: bool) {
         self.window.label_action_oid.set_visible(visible);
         self.window.i_action_oid.set_visible(visible);
@@ -1946,6 +1954,7 @@ If this is the node Cloud Manager is connected to, the session will be disconnec
             self.set_item_filter(false);
             self.set_log_filter(false);
             self.set_action_filter(false);
+            self.set_user_filter(false);
             match nd.kind() {
                 NitKind::Items(_, _) => {
                     self.set_item_filter(true);
@@ -1955,6 +1964,9 @@ If this is the node Cloud Manager is connected to, the session will be disconnec
                 }
                 NitKind::Actions(_) => {
                     self.set_action_filter(true);
+                }
+                NitKind::Users(_) => {
+                    self.set_user_filter(true);
                 }
                 _ => {}
             }
@@ -2003,6 +2015,13 @@ If this is the node Cloud Manager is connected to, the session will be disconnec
         }
     }
     #[allow(clippy::cast_sign_loss)]
+    unsafe fn user_filter(self: &Rc<Self>) -> UsersFilter {
+        let w = &self.window;
+        UsersFilter {
+            svc: w.i_user_service.gso(), //"eva.aaa.localauth"
+        }
+    }
+    #[allow(clippy::cast_sign_loss)]
     unsafe fn action_filter(self: &Rc<Self>) -> ActionFilter {
         let w = &self.window;
         ActionFilter {
@@ -2033,6 +2052,35 @@ If this is the node Cloud Manager is connected to, the session will be disconnec
                 let curr_filter: LogFilter = self.log_filter();
                 if filter.as_ref().map_or(true, |f| f != &curr_filter) {
                     nit = Arc::new(NitData::new_log(nit.node(), curr_filter));
+                }
+            }
+            NitKind::Users(filter) => {
+                let curr_filter: UsersFilter = self.user_filter();
+                if filter.is_none() {
+                    let curr_svc = self.window.i_user_service.gso();
+                    let mut curr_svc_exists = false;
+                    self.window.i_user_service.clear();
+                    let nit_svcs = Arc::new(NitData::new_services(nit.node()));
+                    if let Ok(svcs) = bus::call::<Vec<SvcData>>(nit_svcs) {
+                        for svc in svcs {
+                            if !curr_svc_exists
+                                && curr_svc.as_ref().map_or(false, |id| id == &svc.id)
+                            {
+                                curr_svc_exists = true;
+                            }
+                            if svc.id.starts_with(crate::AAA_SVC_PFX) {
+                                self.window.i_user_service.add_item_q_string(&qs(svc.id));
+                            }
+                        }
+                    }
+                    if curr_svc_exists {
+                        self.window
+                            .i_user_service
+                            .set_current_text(&qs(curr_svc.unwrap()));
+                    }
+                }
+                if filter.as_ref().map_or(true, |f| f != &curr_filter) {
+                    nit = Arc::new(NitData::new_users(nit.node(), curr_filter));
                 }
             }
             NitKind::Actions(filter) => {

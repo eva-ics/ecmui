@@ -7,6 +7,7 @@ use crate::common::{
 use crate::output;
 use crate::smart_table::{FormattedValue, FormattedValueColor, Table};
 use crate::ui;
+use crate::AAA_SVC_PFX;
 use crate::CONTROLLER_SVC_PFX;
 use arboard::Clipboard;
 use busrt::{DEFAULT_BUF_SIZE, DEFAULT_BUF_TTL, DEFAULT_QUEUE_SIZE};
@@ -173,6 +174,8 @@ pub struct Main {
     pub(crate) i_action_oid: QPtr<QLineEdit>,
     pub(crate) label_action_service: QPtr<QLabel>,
     pub(crate) i_action_service: QPtr<QComboBox>,
+    pub(crate) label_user_service: QPtr<QLabel>,
+    pub(crate) i_user_service: QPtr<QComboBox>,
     pub(crate) label_action_limit: QPtr<QLabel>,
     pub(crate) i_action_limit: QPtr<QSpinBox>,
     pub(crate) label_action_time: QPtr<QLabel>,

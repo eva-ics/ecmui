@@ -157,6 +157,10 @@ pub struct ActionFilter {
     pub time: Option<u32>,
     pub limit: Option<u32>,
 }
+#[derive(Serialize, Clone, Debug, Eq, PartialEq)]
+pub struct UsersFilter {
+    pub svc: Option<String>,
+}
 
 #[derive(Deserialize)]
 pub struct ActionRecordFull {
@@ -659,6 +663,13 @@ impl NitData {
             kind: NitKind::Log(Some(filter)),
         }
     }
+    pub fn new_users(node: &str, filter: UsersFilter) -> Self {
+        Self {
+            node: node.to_owned(),
+            kind: NitKind::Users(Some(filter)),
+            // kind: NitKind::Users,
+        }
+    }
     pub fn new_actions(node: &str, filter: ActionFilter) -> Self {
         Self {
             node: node.to_owned(),
@@ -903,6 +914,8 @@ pub enum NitKind {
     Services,
     Items(Option<String>, Option<String>),
     Log(Option<LogFilter>),
+    Users(Option<UsersFilter>),
+    // Users,
     Actions(Option<ActionFilter>),
     ItemGetConfig(String),
     ItemGetState(OID),
@@ -995,6 +1008,10 @@ pub fn nd_from_path(path: &[&str]) -> Option<NitData> {
                 "actions" => Some(NitData {
                     node: (*node_name).to_owned(),
                     kind: NitKind::Actions(None),
+                }),
+                "users" => Some(NitData {
+                    node: (*node_name).to_owned(),
+                    kind: NitKind::Users(None),
                 }),
                 _ => {
                     dbg!(node_name, node_leaf);

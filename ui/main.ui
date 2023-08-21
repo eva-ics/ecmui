@@ -535,6 +535,43 @@
          </layout>
         </item>
         <item>
+         <layout class="QHBoxLayout" name="hl_user_filter">
+          <item>
+           <layout class="QFormLayout" name="formLayout_11">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_user_service">
+              <property name="text">
+               <string>Se&amp;rvice</string>
+              </property>
+              <property name="buddy">
+               <cstring>i_user_service</cstring>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="i_user_service">
+              <property name="minimumSize">
+               <size>
+                <width>250</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>250</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="editable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
          <widget class="QSplitter" name="splitter_tables">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -855,6 +892,7 @@
   <tabstop>i_log_level</tabstop>
   <tabstop>i_action_oid</tabstop>
   <tabstop>i_action_service</tabstop>
+  <tabstop>i_user_service</tabstop>
   <tabstop>i_action_limit</tabstop>
   <tabstop>i_action_time</tabstop>
   <tabstop>i_action_status</tabstop>
