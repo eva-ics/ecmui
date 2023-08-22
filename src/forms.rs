@@ -7,7 +7,6 @@ use crate::common::{
 use crate::output;
 use crate::smart_table::{FormattedValue, FormattedValueColor, Table};
 use crate::ui;
-use crate::AAA_SVC_PFX;
 use crate::CONTROLLER_SVC_PFX;
 use arboard::Clipboard;
 use busrt::{DEFAULT_BUF_SIZE, DEFAULT_BUF_TTL, DEFAULT_QUEUE_SIZE};
@@ -763,15 +762,15 @@ impl DialogSvcEdit {
             }
         }
         self.i_launcher.set_current_text(&qs(params.launcher));
-        let defaut_timeout = params
+        let default_timeout = params
             .timeout
             .default
             .unwrap_or(common::DEFAULT_TIMEOUT_SEC);
-        self.i_timeout_default.set_value(defaut_timeout);
+        self.i_timeout_default.set_value(default_timeout);
         self.i_timeout_startup
-            .set_value(params.timeout.startup.unwrap_or(defaut_timeout));
+            .set_value(params.timeout.startup.unwrap_or(default_timeout));
         self.i_timeout_shutdown
-            .set_value(params.timeout.shutdown.unwrap_or(defaut_timeout));
+            .set_value(params.timeout.shutdown.unwrap_or(default_timeout));
         self.i_bus_type.clear();
         self.i_bus_type
             .add_item_q_string(&qs(common::DEFAULT_BUS_TYPE));

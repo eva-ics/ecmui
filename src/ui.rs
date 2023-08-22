@@ -2018,7 +2018,7 @@ If this is the node Cloud Manager is connected to, the session will be disconnec
     unsafe fn user_filter(self: &Rc<Self>) -> UsersFilter {
         let w = &self.window;
         UsersFilter {
-            svc: w.i_user_service.gso(), //"eva.aaa.localauth"
+            svc: w.i_user_service.gso(),
         }
     }
     #[allow(clippy::cast_sign_loss)]

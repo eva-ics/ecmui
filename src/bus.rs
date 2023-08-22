@@ -352,10 +352,14 @@ async fn do_process_command(client: Arc<EvaCloudClient>, nit: Nit) -> EResult<Va
             }
         }
         NitKind::Users(filter) => {
-            if let Some(_f) = filter {
-                client
-                    .call::<Value>(nit.node(), "eva.aaa.localauth", "user.list", None)
-                    .await
+            if let Some(f) = filter {
+                if let Some(svc) = &f.svc {
+                    client
+                        .call::<Value>(nit.node(), svc, "user.list", None)
+                        .await
+                } else {
+                    Ok(Value::Seq(Vec::new()))
+                }
             } else {
                 Ok(Value::Seq(Vec::new()))
             }

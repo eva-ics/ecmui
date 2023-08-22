@@ -532,6 +532,12 @@ pub struct BrokerClientInfo {
     pub instances: u64,
 }
 
+#[derive(Deserialize)]
+pub struct UserInfo {
+    pub login: String,
+    pub acls: Vec<String>,
+}
+
 #[allow(dead_code)]
 #[derive(Deserialize, Clone)]
 pub struct NodeInfo {
@@ -667,7 +673,6 @@ impl NitData {
         Self {
             node: node.to_owned(),
             kind: NitKind::Users(Some(filter)),
-            // kind: NitKind::Users,
         }
     }
     pub fn new_actions(node: &str, filter: ActionFilter) -> Self {

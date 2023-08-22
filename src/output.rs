@@ -1,6 +1,6 @@
 use crate::common::{
     spent_time, ActionRecord, BrokerInfo, ItemInfo, LogRecord, Nit, NitKind, NodeInfo, SPointInfo,
-    SvcData,
+    SvcData, UserInfo,
 };
 use crate::smart_table::{self, FormattedValue, FormattedValueColor};
 use crate::ui::Ui;
@@ -110,6 +110,10 @@ pub unsafe fn result(ui: &Rc<Ui>, nit: Nit, value: Value) -> EResult<()> {
         }
         NitKind::Broker => {
             list_broker_clients(ui, BrokerInfo::deserialize(value)?);
+            Ok(())
+        }
+        NitKind::Users(_) => {
+            list_users(ui, Vec::deserialize(value)?);
             Ok(())
         }
         NitKind::Log(_) => {
@@ -237,6 +241,23 @@ unsafe fn list_broker_clients(ui: &Rc<Ui>, data: BrokerInfo) {
             row.push(Value::U64(d.instances));
             rows.push(row);
         }
+    }
+    for row in &rows {
+        smart_table.append_row(row.iter().map(Into::into).collect::<Vec<FormattedValue>>());
+    }
+    let mut items = smart_table.fill_qt(qt_table);
+    ui.primary_table_items.lock().unwrap().append(&mut items);
+}
+
+unsafe fn list_users(ui: &Rc<Ui>, data: Vec<UserInfo>) {
+    ui.clear_tables();
+    ui.window.secondary_table.hide();
+    let qt_table = &ui.window.primary_table;
+    let mut smart_table = smart_table::Table::new(&["login", "acls"]);
+    let mut rows: Vec<Vec<Value>> = Vec::new();
+    for d in data {
+        let row: Vec<Value> = vec![Value::String(d.login), Value::String(d.acls.join(","))];
+        rows.push(row);
     }
     for row in &rows {
         smart_table.append_row(row.iter().map(Into::into).collect::<Vec<FormattedValue>>());
