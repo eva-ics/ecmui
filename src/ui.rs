@@ -2073,11 +2073,14 @@ If this is the node Cloud Manager is connected to, the session will be disconnec
                             }
                         }
                     }
-                    if curr_svc_exists {
-                        self.window
-                            .i_user_service
-                            .set_current_text(&qs(curr_svc.unwrap()));
-                    }
+                    let selected_svc = if curr_svc_exists {
+                        curr_svc.unwrap()
+                    } else {
+                        "eva.aaa.localauth".to_string()
+                    };
+                    self.window
+                        .i_user_service
+                        .set_current_text(&qs(selected_svc));
                 }
                 if filter.as_ref().map_or(true, |f| f != &curr_filter) {
                     nit = Arc::new(NitData::new_users(nit.node(), curr_filter));
