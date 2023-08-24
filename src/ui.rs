@@ -2076,7 +2076,7 @@ If this is the node Cloud Manager is connected to, the session will be disconnec
                     let selected_svc = if curr_svc_exists {
                         curr_svc.unwrap()
                     } else {
-                        "eva.aaa.localauth".to_string()
+                        crate::AAA_LOCALAUTH_SVC.to_string()
                     };
                     self.window
                         .i_user_service
