@@ -968,7 +968,7 @@ impl Ui {
                                     let svc_config = bus::call::<Value>(nit_cfg)?;
                                     let id_key = Value::String("id".to_owned());
                                     let mut svc_map = None;
-                                    for svc in svcs.iter_mut() {
+                                    for svc in &mut *svcs {
                                         if let Value::Map(m) = svc {
                                             if let Some(id) = m.get(&id_key) {
                                                 if &id.to_string() == res {
