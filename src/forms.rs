@@ -613,6 +613,7 @@ pub struct DialogSvcEdit {
     i_call_tracing: QPtr<QCheckBox>,
     i_user: QPtr<QLineEdit>,
     i_workers: QPtr<QSpinBox>,
+    i_mem_warn: QPtr<QSpinBox>,
     i_timeout_default: QPtr<QDoubleSpinBox>,
     i_timeout_startup: QPtr<QDoubleSpinBox>,
     i_timeout_shutdown: QPtr<QDoubleSpinBox>,
@@ -687,6 +688,7 @@ impl DialogSvcEdit {
         self.i_call_tracing.set_check_state(CheckState::Unchecked);
         self.i_user.set_text(&qs(""));
         self.i_workers.set_value(1);
+        self.i_mem_warn.set_value(128);
         self.i_launcher.clear();
         self.i_launcher
             .add_item_q_string(&qs(common::LAUNCHER_MAIN));
@@ -750,6 +752,8 @@ impl DialogSvcEdit {
         });
         set_opt_str!(params.user, self.i_user, "");
         self.i_workers.set_value(params.workers);
+        self.i_mem_warn
+            .set_value(i32::try_from(params.mem_warn / 1048576).unwrap_or_default());
         self.i_launcher.clear();
         self.i_launcher
             .add_item_q_string(&qs(common::LAUNCHER_MAIN));
@@ -840,6 +844,7 @@ impl DialogSvcEdit {
             user: self.i_user.gso(),
             config,
             workers: self.i_workers.value(),
+            mem_warn: u64::try_from(self.i_mem_warn.value() * 1048576).unwrap_or_default(),
             launcher: self.i_launcher.gs(),
             timeout,
             bus,

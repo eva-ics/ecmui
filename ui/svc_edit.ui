@@ -10,19 +10,19 @@
     <x>0</x>
     <y>0</y>
     <width>560</width>
-    <height>450</height>
+    <height>480</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>560</width>
-    <height>450</height>
+    <height>480</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>560</width>
-    <height>450</height>
+    <height>480</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -36,7 +36,7 @@
    <property name="geometry">
     <rect>
      <x>210</x>
-     <y>407</y>
+     <y>430</y>
      <width>341</width>
      <height>32</height>
     </rect>
@@ -54,7 +54,7 @@
      <x>0</x>
      <y>0</y>
      <width>561</width>
-     <height>391</height>
+     <height>421</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -72,8 +72,8 @@
       <rect>
        <x>10</x>
        <y>10</y>
-       <width>541</width>
-       <height>342</height>
+       <width>531</width>
+       <height>391</height>
       </rect>
      </property>
      <layout class="QFormLayout" name="formLayout">
@@ -167,7 +167,7 @@
         </property>
        </widget>
       </item>
-      <item row="7" column="0">
+      <item row="8" column="0">
        <widget class="QLabel" name="label_6">
         <property name="text">
          <string>System &amp;user</string>
@@ -177,10 +177,10 @@
         </property>
        </widget>
       </item>
-      <item row="7" column="1">
+      <item row="8" column="1">
        <widget class="QLineEdit" name="i_user"/>
       </item>
-      <item row="8" column="1">
+      <item row="9" column="1">
        <widget class="QComboBox" name="i_launcher">
         <property name="editable">
          <bool>true</bool>
@@ -192,7 +192,7 @@
         </item>
        </widget>
       </item>
-      <item row="8" column="0">
+      <item row="9" column="0">
        <widget class="QLabel" name="label_7">
         <property name="text">
          <string>&amp;Launcher</string>
@@ -202,7 +202,7 @@
         </property>
        </widget>
       </item>
-      <item row="10" column="0">
+      <item row="11" column="0">
        <widget class="QCheckBox" name="i_react_to_fail">
         <property name="text">
          <string>&amp;React to fail</string>
@@ -261,17 +261,43 @@
         </property>
        </widget>
       </item>
-      <item row="9" column="0">
+      <item row="10" column="0">
        <widget class="QCheckBox" name="i_enabled">
         <property name="text">
          <string>&amp;Enabled</string>
         </property>
        </widget>
       </item>
-      <item row="11" column="0">
+      <item row="12" column="0">
        <widget class="QCheckBox" name="i_call_tracing">
         <property name="text">
          <string>Call tracin&amp;g</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="label_17">
+        <property name="text">
+         <string>&amp;Memory warn (MiB)</string>
+        </property>
+        <property name="buddy">
+         <cstring>i_mem_warn</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QSpinBox" name="i_mem_warn">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>999999999</number>
+        </property>
+        <property name="singleStep">
+         <number>10</number>
+        </property>
+        <property name="value">
+         <number>128</number>
         </property>
        </widget>
       </item>
@@ -481,7 +507,7 @@
    <property name="geometry">
     <rect>
      <x>116</x>
-     <y>407</y>
+     <y>430</y>
      <width>28</width>
      <height>22</height>
     </rect>
@@ -494,7 +520,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>410</y>
+     <y>433</y>
      <width>101</width>
      <height>16</height>
     </rect>
@@ -516,6 +542,7 @@
   <tabstop>i_timeout_startup</tabstop>
   <tabstop>i_timeout_shutdown</tabstop>
   <tabstop>i_workers</tabstop>
+  <tabstop>i_mem_warn</tabstop>
   <tabstop>i_user</tabstop>
   <tabstop>i_launcher</tabstop>
   <tabstop>i_enabled</tabstop>

@@ -130,6 +130,10 @@ fn default_workers() -> c_int {
     1
 }
 
+fn default_mem_warn() -> u64 {
+    134217728
+}
+
 fn default_launcher() -> String {
     LAUNCHER_MAIN.to_owned()
 }
@@ -249,6 +253,8 @@ pub struct ServiceParams {
     pub config: Value,
     #[serde(default = "default_workers")]
     pub workers: c_int,
+    #[serde(default = "default_mem_warn")]
+    pub mem_warn: u64,
     #[serde(default = "default_launcher")]
     pub launcher: String,
     #[serde(default)]
